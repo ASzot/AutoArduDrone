@@ -123,30 +123,30 @@ namespace MissionPlanner.Models
 
         public void SetPins(PinNumbers pins)
         {
-            MainV2.comPort.setParam("BATT_VOLT_PIN", pins.volpin);
-            MainV2.comPort.setParam("BATT_CURR_PIN", pins.curpin);
+            ArduinoInterface.ComPort.setParam("BATT_VOLT_PIN", pins.volpin);
+            ArduinoInterface.ComPort.setParam("BATT_CURR_PIN", pins.curpin);
         }
 
         public void SetSensor(Sensor sensorselected)
         {
-            MainV2.comPort.setParam("BATT_APM_PERVOLT", sensorselected.ampspervolt);
+            ArduinoInterface.ComPort.setParam("BATT_APM_PERVOLT", sensorselected.ampspervolt);
 
-            MainV2.comPort.setParam("BATT_VOLT_MULT", sensorselected.voltspervolt);
+            ArduinoInterface.ComPort.setParam("BATT_VOLT_MULT", sensorselected.voltspervolt);
         }
 
         public void SetMode(MonitorModes modes)
         {
-            MainV2.comPort.setParam("BATT_MONITOR", modes.value);
+            ArduinoInterface.ComPort.setParam("BATT_MONITOR", modes.value);
         }
 
         public void SetBattCapacity(int mah)
         {
-            MainV2.comPort.setParam("BATT_CAPACITY", mah);
+            ArduinoInterface.ComPort.setParam("BATT_CAPACITY", mah);
         }
 
         public void SetAmpOffset(float offset)
         {
-            MainV2.comPort.setParam("BATT_AMP_OFFSET", offset);
+            ArduinoInterface.ComPort.setParam("BATT_AMP_OFFSET", offset);
         }
 
         public class MonitorModes

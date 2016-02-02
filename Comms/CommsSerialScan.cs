@@ -96,7 +96,7 @@ namespace MissionPlanner.Comms
 
                         if (CommsSerialScan.connect)
                         {
-                            MainV2.comPort.BaseStream = port.BaseStream;
+                            ArduinoInterface.ComPort.BaseStream = port.BaseStream;
 
                             doconnect();
                         }
@@ -149,22 +149,7 @@ namespace MissionPlanner.Comms
 
         static void doconnect()
         {
-            if (MainV2.instance == null)
-            {
-                MainV2.comPort.Open(false);
-            }
-            else
-            {
-                if (MainV2.instance.InvokeRequired)
-                {
-                    MainV2.instance.BeginInvoke(
-                        (System.Windows.Forms.MethodInvoker) delegate() { MainV2.comPort.Open(true); });
-                }
-                else
-                {
-                    MainV2.comPort.Open(true);
-                }
-            }
+            ArduinoInterface.ComPort.Open(false);
         }
     }
 }

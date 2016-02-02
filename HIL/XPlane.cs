@@ -174,10 +174,10 @@ namespace MissionPlanner.HIL
 
         public override void SendToSim()
         {
-            roll_out = (float) MainV2.comPort.MAV.cs.hilch1/rollgain;
-            pitch_out = (float) MainV2.comPort.MAV.cs.hilch2/pitchgain;
-            throttle_out = ((float) MainV2.comPort.MAV.cs.hilch3)/throttlegain;
-            rudder_out = (float) MainV2.comPort.MAV.cs.hilch4/ruddergain;
+            roll_out = (float) ArduinoInterface.ComPort.MAV.cs.hilch1/rollgain;
+            pitch_out = (float) ArduinoInterface.ComPort.MAV.cs.hilch2/pitchgain;
+            throttle_out = ((float) ArduinoInterface.ComPort.MAV.cs.hilch3)/throttlegain;
+            rudder_out = (float) ArduinoInterface.ComPort.MAV.cs.hilch4/ruddergain;
 
             // Limit min and max
             roll_out = Constrain(roll_out, -1, 1);
@@ -308,9 +308,9 @@ namespace MissionPlanner.HIL
             hilstate.yacc = (short) (sitldata.yAccel*1000); // (mg)
             hilstate.zacc = (short) (sitldata.zAccel*1000); // (mg)
 
-            MainV2.comPort.sendPacket(hilstate);
+            ArduinoInterface.ComPort.sendPacket(hilstate);
 
-            MainV2.comPort.sendPacket(new MAVLink.mavlink_vfr_hud_t()
+            ArduinoInterface.ComPort.sendPacket(new MAVLink.mavlink_vfr_hud_t()
             {
                 airspeed = (float) sitldata.airspeed
             });

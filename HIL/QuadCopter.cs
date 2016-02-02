@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text;
 using log4net;
 using MissionPlanner.HIL;
-using MissionPlanner.GCSViews;
 
 
 namespace MissionPlanner.HIL
@@ -348,7 +347,7 @@ namespace MissionPlanner.HIL
             self = this;
 
             motors = Motor.build_motors(MAVLink.MAV_TYPE.QUADROTOR,
-                (int) MissionPlanner.GCSViews.ConfigurationView.ConfigFrameType.Frame.Plus);
+                (int) 0);
             motor_speed = new double[motors.Length];
             mass = 1.5; // # Kg
             frame_height = 0.1;
@@ -368,7 +367,7 @@ namespace MissionPlanner.HIL
         }
 
 
-        public void update(ref double[] servos, Simulation.FGNetFDM fdm)
+        public void update(ref double[] servos)
         {
             for (int i = 0; i < servos.Length; i++)
             {
@@ -467,10 +466,10 @@ namespace MissionPlanner.HIL
 
             if (home_latitude == 0)
             {
-                home_latitude = fdm.latitude*rad2deg;
-                home_longitude = fdm.longitude*rad2deg;
-                home_altitude = fdm.altitude;
-                ground_level = home_altitude;
+                home_latitude = 0.0;
+                home_longitude = 0.0;
+                home_altitude = 0.0;
+                ground_level = 0.0;
             }
 
             // constrain height to the ground

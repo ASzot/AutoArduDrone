@@ -30,7 +30,7 @@ namespace GMap.NET.MapProviders
          }
       }
 
-      readonly string name = Resources.Strings.BingSatelliteMap;
+      readonly string name = Resources."BingSatelliteMap;
       public override string Name
       {
          get

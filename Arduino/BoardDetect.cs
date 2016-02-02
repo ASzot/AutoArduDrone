@@ -43,142 +43,110 @@ namespace MissionPlanner.Arduino
             SerialPort serialPort = new SerialPort();
             serialPort.PortName = port;
 
-            if (!MainV2.MONO)
+            ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_SerialPort"); // Win32_USBControllerDevice
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            foreach (ManagementObject obj2 in searcher.Get())
             {
-                ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_SerialPort"); // Win32_USBControllerDevice
-                ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
-                foreach (ManagementObject obj2 in searcher.Get())
+                Console.WriteLine("PNPID: " + obj2.Properties["PNPDeviceID"].Value.ToString());
+
+                // check vid and pid
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_2341&PID_0010"))
                 {
-                    Console.WriteLine("PNPID: " + obj2.Properties["PNPDeviceID"].Value.ToString());
-
-                    // check vid and pid
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_2341&PID_0010"))
+                    // check port name as well
+                    if (obj2.Properties["Name"].Value.ToString().ToUpper().Contains(serialPort.PortName.ToUpper()))
                     {
-                        // check port name as well
-                        if (obj2.Properties["Name"].Value.ToString().ToUpper().Contains(serialPort.PortName.ToUpper()))
-                        {
-                            log.Info("is a 2560-2");
-                            return boards.b2560v2;
-                        }
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0010"))
-                    {
-                        // check port name as well
-                        //if (obj2.Properties["Name"].Value.ToString().ToUpper().Contains(serialPort.PortName.ToUpper()))
-                        {
-                            log.Info("is a px4");
-                            return boards.px4;
-                        }
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0011"))
-                    {
-                        log.Info("is a px4v2");
-                        return boards.px4v2;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0012"))
-                    {
-                        log.Info("is a px4v4 pixracer");
-                        return boards.px4v4;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0001"))
-                    {
-                        log.Info("is a px4v2 bootloader");
-                        return boards.px4v2;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0016"))
-                    {
-                        log.Info("is a px4v2 bootloader");
-                        CustomMessageBox.Show(
-                            "You appear to have a bootloader with a bad PID value, please update your bootloader.");
-                        return boards.px4v2;
-                    }
-
-                    //|| obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0012") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0013") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0014") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0015") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0016")
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1140"))
-                    {
-                        log.Info("is a vrbrain 4.0 bootloader");
-                        return boards.vrbrainv40;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1145"))
-                    {
-                        log.Info("is a vrbrain 4.5 bootloader");
-                        return boards.vrbrainv45;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1150"))
-                    {
-                        log.Info("is a vrbrain 5.0 bootloader");
-                        return boards.vrbrainv50;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1151"))
-                    {
-                        log.Info("is a vrbrain 5.1 bootloader");
-                        return boards.vrbrainv51;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1152"))
-                    {
-                        log.Info("is a vrbrain 5.2 bootloader");
-                        return boards.vrbrainv52;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1910"))
-                    {
-                        log.Info("is a vrbrain core 1.0 bootloader");
-                        return boards.vrcorev10;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1351"))
-                    {
-                        log.Info("is a vrubrain 5.1 bootloader");
-                        return boards.vrubrainv51;
-                    }
-
-                    if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1352"))
-                    {
-                        log.Info("is a vrubrain 5.2 bootloader");
-                        return boards.vrubrainv52;
+                        log.Info("is a 2560-2");
+                        return boards.b2560v2;
                     }
                 }
-            }
-            else
-            {
-                // if its mono
-                if (DialogResult.Yes == CustomMessageBox.Show("Is this a APM 2+?", "APM 2+", MessageBoxButtons.YesNo))
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0010"))
                 {
-                    return boards.b2560v2;
-                }
-                else
-                {
-                    if (DialogResult.Yes ==
-                        CustomMessageBox.Show("Is this a PX4/PIXHAWK/PIXRACER?", "PX4/PIXHAWK", MessageBoxButtons.YesNo))
+                    // check port name as well
+                    //if (obj2.Properties["Name"].Value.ToString().ToUpper().Contains(serialPort.PortName.ToUpper()))
                     {
-                        if (DialogResult.Yes ==
-                            CustomMessageBox.Show("Is this a PIXRACER?", "PIXRACER", MessageBoxButtons.YesNo))
-                        {
-                            return boards.px4v4;
-                        }
-                        if (DialogResult.Yes ==
-                            CustomMessageBox.Show("Is this a PIXHAWK?", "PIXHAWK", MessageBoxButtons.YesNo))
-                        {
-                            return boards.px4v2;
-                        }
+                        log.Info("is a px4");
                         return boards.px4;
                     }
-                    else
-                    {
-                        return boards.b2560;
-                    }
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0011"))
+                {
+                    log.Info("is a px4v2");
+                    return boards.px4v2;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0012"))
+                {
+                    log.Info("is a px4v4 pixracer");
+                    return boards.px4v4;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0001"))
+                {
+                    log.Info("is a px4v2 bootloader");
+                    return boards.px4v2;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0016"))
+                {
+                    log.Info("is a px4v2 bootloader");
+                    CustomMessageBox.Show(
+                        "You appear to have a bootloader with a bad PID value, please update your bootloader.");
+                    return boards.px4v2;
+                }
+
+                //|| obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0012") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0013") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0014") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0015") || obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_26AC&PID_0016")
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1140"))
+                {
+                    log.Info("is a vrbrain 4.0 bootloader");
+                    return boards.vrbrainv40;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1145"))
+                {
+                    log.Info("is a vrbrain 4.5 bootloader");
+                    return boards.vrbrainv45;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1150"))
+                {
+                    log.Info("is a vrbrain 5.0 bootloader");
+                    return boards.vrbrainv50;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1151"))
+                {
+                    log.Info("is a vrbrain 5.1 bootloader");
+                    return boards.vrbrainv51;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1152"))
+                {
+                    log.Info("is a vrbrain 5.2 bootloader");
+                    return boards.vrbrainv52;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1910"))
+                {
+                    log.Info("is a vrbrain core 1.0 bootloader");
+                    return boards.vrcorev10;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1351"))
+                {
+                    log.Info("is a vrubrain 5.1 bootloader");
+                    return boards.vrubrainv51;
+                }
+
+                if (obj2.Properties["PNPDeviceID"].Value.ToString().Contains(@"USB\VID_27AC&PID_1352"))
+                {
+                    log.Info("is a vrubrain 5.2 bootloader");
+                    return boards.vrubrainv52;
                 }
             }
+           
 
             if (serialPort.IsOpen)
                 serialPort.Close();
@@ -239,13 +207,12 @@ namespace MissionPlanner.Arduino
                     {
                         serialPort.Close();
                         //HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\VID_2341&PID_0010\640333439373519060F0\Device Parameters
-                        if (!MainV2.MONO &&
-                            !Thread.CurrentThread.CurrentCulture.IsChildOf(CultureInfoEx.GetCultureInfo("zh-Hans")))
+                        if (!Thread.CurrentThread.CurrentCulture.IsChildOf(CultureInfoEx.GetCultureInfo("zh-Hans")))
                         {
-                            ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_SerialPort");
+                            ObjectQuery subQuery = new ObjectQuery("SELECT * FROM Win32_SerialPort");
                                 // Win32_USBControllerDevice
-                            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
-                            foreach (ManagementObject obj2 in searcher.Get())
+                            ManagementObjectSearcher mgrSearcher = new ManagementObjectSearcher(subQuery);
+                            foreach (ManagementObject obj2 in mgrSearcher.Get())
                             {
                                 //Console.WriteLine("Dependant : " + obj2["Dependent"]);
 

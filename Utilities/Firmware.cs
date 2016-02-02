@@ -158,8 +158,6 @@ namespace MissionPlanner.Utilities
                     a++;
                 }
             }
-
-            System.Threading.Thread.CurrentThread.CurrentUICulture = L10N.ConfigLang;
         }
 
         /// <summary>
@@ -170,9 +168,6 @@ namespace MissionPlanner.Utilities
         {
             if (firmwareurl == "")
                 firmwareurl = this.firmwareurl;
-
-            // mirror support
-            L10N.ReplaceMirrorUrl(ref firmwareurl);
 
             log.Info("getFWList");
 
@@ -204,7 +199,7 @@ namespace MissionPlanner.Utilities
                 new System.Net.Security.RemoteCertificateValidationCallback(
                     (sender1, certificate, chain, policyErrors) => { return true; });
 
-            updateProgress(-1, Strings.GettingFWList);
+            updateProgress(-1, "GettingFWList");
 
             try
             {
@@ -354,7 +349,7 @@ namespace MissionPlanner.Utilities
 
             log.Info("load done");
 
-            updateProgress(-1, Strings.ReceivedList);
+            updateProgress(-1, "ReceivedList");
 
             return softwares;
         }
@@ -407,7 +402,6 @@ namespace MissionPlanner.Utilities
         /// <returns></returns>
         void getAPMVersion(object tempin)
         {
-            System.Threading.Thread.CurrentThread.CurrentUICulture = L10N.ConfigLang;
 
             try
             {
@@ -417,13 +411,11 @@ namespace MissionPlanner.Utilities
 
                 if (baseurl == "") return;
 
-                L10N.ReplaceMirrorUrl(ref baseurl);
-
                 Uri url = new Uri(new Uri(baseurl), "git-version.txt");
 
                 log.Info("Get url " + url.ToString());
 
-                updateProgress(-1, Strings.GettingFWVersion);
+                updateProgress(-1, "GettingFWVersion");
 
                 WebRequest wr = WebRequest.Create(url);
                 WebResponse wresp = wr.GetResponse();
@@ -477,13 +469,13 @@ namespace MissionPlanner.Utilities
 
             try
             {
-                updateProgress(-1, Strings.DetectingBoardVersion);
+                updateProgress(-1, "DetectingBoardVersion");
 
                 board = BoardDetect.DetectBoard(comport);
 
                 if (board == BoardDetect.boards.none)
                 {
-                    CustomMessageBox.Show(Strings.CantDetectBoardVersion);
+                    CustomMessageBox.Show("CantDetectBoardVersion");
                     return false;
                 }
 
@@ -506,11 +498,11 @@ namespace MissionPlanner.Utilities
                     if (apmformat_version != -1 && apmformat_version != temp.k_format_version)
                     {
                         if (DialogResult.No ==
-                            CustomMessageBox.Show(Strings.EppromChanged,
-                                String.Format(Strings.EppromFormatChanged, apmformat_version, temp.k_format_version),
+                            CustomMessageBox.Show("EppromChanged",
+                                String.Format("EppromFormatChanged", apmformat_version, temp.k_format_version),
                                 MessageBoxButtons.YesNo))
                         {
-                            CustomMessageBox.Show(Strings.PleaseConnectAndBackupConfig);
+                            CustomMessageBox.Show("PleaseConnectAndBackupConfig");
                             return false;
                         }
                     }
@@ -519,7 +511,7 @@ namespace MissionPlanner.Utilities
 
                 log.Info("Detected a " + board);
 
-                updateProgress(-1, Strings.DetectedA + board);
+                updateProgress(-1, "DetectedA" + board);
 
                 string baseurl = "";
                 if (board == BoardDetect.boards.b2560)
@@ -580,7 +572,7 @@ namespace MissionPlanner.Utilities
                 }
                 else
                 {
-                    CustomMessageBox.Show(Strings.InvalidBoardType);
+                    CustomMessageBox.Show("InvalidBoardType");
                     return false;
                 }
 
@@ -588,7 +580,7 @@ namespace MissionPlanner.Utilities
                 {
                     if (temp.name.ToLower().Contains("arducopter"))
                     {
-                        CustomMessageBox.Show(Strings.ThisBoardHasBeenRetired, Strings.Note);
+                        CustomMessageBox.Show("ThisBoardHasBeenRetired", "Note");
                     }
                 }
 
@@ -596,7 +588,6 @@ namespace MissionPlanner.Utilities
                     baseurl = getUrl(historyhash, baseurl);
 
                 // update to use mirror url
-                L10N.ReplaceMirrorUrl(ref baseurl);
 
                 log.Info("Using " + baseurl);
 
@@ -624,7 +615,7 @@ namespace MissionPlanner.Utilities
                         Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar +
                         @"firmware.hex", FileMode.Create);
 
-                updateProgress(0, Strings.DownloadingFromInternet);
+                updateProgress(0, "DownloadingFromInternet");
 
                 dataStream.ReadTimeout = 30000;
 
@@ -632,7 +623,7 @@ namespace MissionPlanner.Utilities
                 {
                     try
                     {
-                        updateProgress(50, Strings.DownloadingFromInternet);
+                        updateProgress(50, "DownloadingFromInternet");
                     }
                     catch
                     {
@@ -648,12 +639,12 @@ namespace MissionPlanner.Utilities
                 dataStream.Close();
                 response.Close();
 
-                updateProgress(100, Strings.DownloadedFromInternet);
+                updateProgress(100, "DownloadedFromInternet");
                 log.Info("Downloaded");
             }
             catch (Exception ex)
             {
-                updateProgress(50, Strings.FailedDownload);
+                updateProgress(50, "FailedDownload");
                 CustomMessageBox.Show("Failed to download new firmware : " + ex.ToString());
                 return false;
             }
@@ -666,25 +657,6 @@ namespace MissionPlanner.Utilities
 
         void apmtype(object temp)
         {
-            try
-            {
-                // Create a request using a URL that can receive a post. 
-                HttpWebRequest request =
-                    (HttpWebRequest) HttpWebRequest.Create("http://vps.oborne.me/axs/ax.pl?" + (string) temp);
-                //request.AllowAutoRedirect = true;
-                request.UserAgent = MainV2.instance.Text + " (res" + Screen.PrimaryScreen.Bounds.Width + "x" +
-                                    Screen.PrimaryScreen.Bounds.Height + "; " + Environment.OSVersion.VersionString +
-                                    "; cores " + Environment.ProcessorCount + ")";
-                request.Timeout = 10000;
-                // Set the Method property of the request to POST.
-                request.Method = "GET";
-                // Get the request stream.
-                // Get the response.
-                WebResponse response = request.GetResponse();
-            }
-            catch
-            {
-            }
         }
 
         /// <summary>
@@ -702,20 +674,20 @@ namespace MissionPlanner.Utilities
             }
             catch (Exception ex)
             {
-                CustomMessageBox.Show(Strings.ErrorFirmwareFile + "\n\n" + ex.ToString(), Strings.ERROR);
+                CustomMessageBox.Show("ErrorFirmwareFile" + "\n\n" + ex.ToString(), "ERROR");
                 return false;
             }
 
             try
             {
                 // check if we are seeing heartbeats
-                MainV2.comPort.BaseStream.Open();
-                MainV2.comPort.giveComport = true;
+                ArduinoInterface.ComPort.BaseStream.Open();
+                ArduinoInterface.ComPort.giveComport = true;
 
-                if (MainV2.comPort.getHeartBeat().Length > 0)
+                if (ArduinoInterface.ComPort.getHeartBeat().Length > 0)
                 {
-                    MainV2.comPort.doReboot(true);
-                    MainV2.comPort.Close();
+                    ArduinoInterface.ComPort.doReboot(true);
+                    ArduinoInterface.ComPort.Close();
 
                     //specific action for VRBRAIN4 board that needs to be manually disconnected before uploading
                     if (board == BoardDetect.boards.vrbrainv40)
@@ -726,14 +698,14 @@ namespace MissionPlanner.Utilities
                 }
                 else
                 {
-                    MainV2.comPort.BaseStream.Close();
-                    CustomMessageBox.Show(Strings.PleaseUnplugTheBoardAnd);
+                    ArduinoInterface.ComPort.BaseStream.Close();
+                    CustomMessageBox.Show("PleaseUnplugTheBoardAnd");
                 }
             }
             catch (Exception ex)
             {
                 log.Error(ex);
-                CustomMessageBox.Show(Strings.PleaseUnplugTheBoardAnd);
+                CustomMessageBox.Show("Please unplug board or something");
             }
 
             DateTime DEADLINE = DateTime.Now.AddSeconds(30);
@@ -797,7 +769,7 @@ namespace MissionPlanner.Utilities
                     {
                         up.__reboot();
                         up.close();
-                        CustomMessageBox.Show(Strings.NoNeedToUpload);
+                        CustomMessageBox.Show("NoNeedToUpload");
                         return true;
                     }
 
@@ -820,7 +792,7 @@ namespace MissionPlanner.Utilities
                     }
 
                     // wait for IO firmware upgrade and boot to a mavlink state
-                    CustomMessageBox.Show(Strings.PleaseWaitForTheMusicalTones);
+                    CustomMessageBox.Show("PleaseWaitForTheMusicalTones");
 
                     return true;
                 }
@@ -845,20 +817,20 @@ namespace MissionPlanner.Utilities
             }
             catch (Exception ex)
             {
-                CustomMessageBox.Show(Strings.ErrorFirmwareFile + "\n\n" + ex.ToString(), Strings.ERROR);
+                CustomMessageBox.Show("ErrorFirmwareFile" + "\n\n" + ex.ToString(), "ERROR");
                 return false;
             }
 
             try
             {
                 // check if we are seeing heartbeats
-                MainV2.comPort.BaseStream.Open();
-                MainV2.comPort.giveComport = true;
+                ArduinoInterface.ComPort.BaseStream.Open();
+                ArduinoInterface.ComPort.giveComport = true;
 
-                if (MainV2.comPort.getHeartBeat().Length > 0)
+                if (ArduinoInterface.ComPort.getHeartBeat().Length > 0)
                 {
-                    MainV2.comPort.doReboot(true);
-                    MainV2.comPort.Close();
+                    ArduinoInterface.ComPort.doReboot(true);
+                    ArduinoInterface.ComPort.Close();
 
                     //specific action for VRBRAIN4 board that needs to be manually disconnected before uploading
                     if (board == BoardDetect.boards.vrbrainv40)
@@ -869,14 +841,14 @@ namespace MissionPlanner.Utilities
                 }
                 else
                 {
-                    MainV2.comPort.BaseStream.Close();
-                    CustomMessageBox.Show(Strings.PleaseUnplugTheBoardAnd);
+                    ArduinoInterface.ComPort.BaseStream.Close();
+                    CustomMessageBox.Show("PleaseUnplugTheBoardAnd");
                 }
             }
             catch (Exception ex)
             {
                 log.Error(ex);
-                CustomMessageBox.Show(Strings.PleaseUnplugTheBoardAnd);
+                CustomMessageBox.Show("PleaseUnplugTheBoardAnd");
             }
 
             DateTime DEADLINE = DateTime.Now.AddSeconds(30);
@@ -929,7 +901,7 @@ namespace MissionPlanner.Utilities
                     {
                         up.__reboot();
                         up.close();
-                        CustomMessageBox.Show(Strings.NoNeedToUpload);
+                        CustomMessageBox.Show("NoNeedToUpload");
                         return true;
                     }
 
@@ -967,7 +939,7 @@ namespace MissionPlanner.Utilities
                     else
                     {
                         // wait for IO firmware upgrade and boot to a mavlink state
-                        CustomMessageBox.Show(Strings.PleaseWaitForTheMusicalTones);
+                        CustomMessageBox.Show("PleaseWaitForTheMusicalTones");
                     }
                     return true;
                 }
@@ -1007,7 +979,7 @@ namespace MissionPlanner.Utilities
                 }
                 catch (MissingFieldException)
                 {
-                    CustomMessageBox.Show("Please update, your install is currupt", Strings.ERROR);
+                    CustomMessageBox.Show("Please update, your install is currupt", "ERROR");
                     return false;
                 }
             }
@@ -1023,7 +995,7 @@ namespace MissionPlanner.Utilities
             byte[] FLASH = new byte[1];
             try
             {
-                updateProgress(0, Strings.ReadingHexFile);
+                updateProgress(0, "ReadingHexFile");
                 using (StreamReader sr = new StreamReader(filename))
                 {
                     FLASH = readIntelHEXv2(sr);
@@ -1032,8 +1004,8 @@ namespace MissionPlanner.Utilities
             }
             catch (Exception ex)
             {
-                updateProgress(0, Strings.FailedReadHEX);
-                CustomMessageBox.Show(Strings.FailedToReadHex + ex.Message);
+                updateProgress(0, "FailedReadHEX");
+                CustomMessageBox.Show("FailedToReadHex" + ex.Message);
                 return false;
             }
             IArduinoComms port = new ArduinoSTK();
@@ -1069,7 +1041,7 @@ namespace MissionPlanner.Utilities
                 if (port.connectAP())
                 {
                     log.Info("starting");
-                    updateProgress(0, String.Format(Strings.UploadingBytesToBoard, FLASH.Length) + board);
+                    updateProgress(0, String.Format("UploadingBytesToBoard", FLASH.Length) + board);
 
                     // this is enough to make ap_var reset
                     //port.upload(new byte[256], 0, 2, 0);
@@ -1085,7 +1057,7 @@ namespace MissionPlanner.Utilities
 
                     port.Progress -= updateProgress;
 
-                    updateProgress(100, Strings.UploadComplete);
+                    updateProgress(100, "UploadComplete");
 
                     log.Info("Uploaded");
 
@@ -1094,11 +1066,11 @@ namespace MissionPlanner.Utilities
 
                     byte[] flashverify = new byte[FLASH.Length + 256];
 
-                    updateProgress(0, Strings.VerifyFirmware);
+                    updateProgress(0, "VerifyFirmware");
 
                     while (start < FLASH.Length)
                     {
-                        updateProgress((int) ((start/(float) FLASH.Length)*100), Strings.VerifyFirmware);
+                        updateProgress((int) ((start/(float) FLASH.Length)*100), "VerifyFirmware");
                         port.setaddress(start);
                         //log.Info("Downloading " + length + " at " + start);
                         port.downloadflash(length).CopyTo(flashverify, start);
@@ -1110,19 +1082,19 @@ namespace MissionPlanner.Utilities
                         if (FLASH[s] != flashverify[s])
                         {
                             CustomMessageBox.Show(
-                                String.Format(Strings.UploadSucceededButVerifyFailed, FLASH[s].ToString("X"),
+                                String.Format("UploadSucceededButVerifyFailed", FLASH[s].ToString("X"),
                                     flashverify[s].ToString("X")) + s);
                             port.Close();
                             return false;
                         }
                     }
 
-                    updateProgress(100, Strings.VerifyComplete);
+                    updateProgress(100, "VerifyComplete");
                 }
                 else
                 {
-                    updateProgress(0, Strings.FailedUpload);
-                    CustomMessageBox.Show(Strings.CommunicationErrorNoConnection);
+                    updateProgress(0, "FailedUpload");
+                    CustomMessageBox.Show("CommunicationErrorNoConnection");
                 }
                 port.Close();
 
@@ -1144,12 +1116,12 @@ namespace MissionPlanner.Utilities
                 {
                 }
 
-                updateProgress(100, Strings.Done);
+                updateProgress(100, "Done");
             }
             catch (Exception ex)
             {
-                updateProgress(0, Strings.FailedUpload);
-                CustomMessageBox.Show(Strings.CheckPortSettingsOr + ex);
+                updateProgress(0, "FailedUpload");
+                CustomMessageBox.Show("CheckPortSettingsOr" + ex);
                 try
                 {
                     port.Close();
@@ -1159,7 +1131,7 @@ namespace MissionPlanner.Utilities
                 }
                 return false;
             }
-            MainV2.comPort.giveComport = false;
+            ArduinoInterface.ComPort.giveComport = false;
             return true;
         }
 
@@ -1179,7 +1151,7 @@ namespace MissionPlanner.Utilities
             while (!sr.EndOfStream)
             {
                 updateProgress((int) (((float) sr.BaseStream.Position/(float) sr.BaseStream.Length)*100),
-                    Strings.ReadingHex);
+                    "ReadingHex");
 
                 string line = sr.ReadLine();
 

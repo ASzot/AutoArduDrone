@@ -86,7 +86,7 @@ namespace MissionPlanner.Comms
 
             host = OnSettings("UDP_host", host);
 
-            //if (!MainV2.MONO)
+            //if (!MainProgram.MONO)
             {
                 if (System.Windows.Forms.DialogResult.Cancel == InputBox.Show("remote host", "Enter host name/ip (ensure remote end is already started)", ref host))
                 {

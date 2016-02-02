@@ -72,12 +72,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ControlExt.cs" />
-    <Compile Include="Coords.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Coords.Designer.cs">
-      <DependentUpon>Coords.cs</DependentUpon>
-    </Compile>
     <Compile Include="CustomMessageBox.cs" />
     <Compile Include="FileBrowse.cs">
       <SubType>UserControl</SubType>
@@ -135,9 +129,6 @@
     <Compile Include="MainSwitcher.cs" />
     <Compile Include="MyButton.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="myGMAP.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="MyLabel.cs">
       <SubType>Component</SubType>
@@ -235,9 +226,6 @@
     <EmbeddedResource Include="BackstageView\BackstageView.resx">
       <DependentUpon>BackstageView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Coords.resx">
-      <DependentUpon>Coords.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="FileBrowse.resx">
       <DependentUpon>FileBrowse.cs</DependentUpon>
     </EmbeddedResource>
@@ -312,18 +300,6 @@
     <ProjectReference Include="..\BSE.Windows.Forms\BSE.Windows.Forms.csproj">
       <Project>{9CA367B8-0B98-49D1-84FB-735E612E3BA9}</Project>
       <Name>BSE.Windows.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GeoUtility\GeoUtility.csproj">
-      <Project>{7F7994CE-823F-4A04-BBEA-D0A3808FF56D}</Project>
-      <Name>GeoUtility</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GMap.NET.Core\GMap.NET.Core.csproj">
-      <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
-      <Name>GMap.NET.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
-      <Project>{e06def77-f933-42fb-afd7-db2d0d8d6a98}</Project>
-      <Name>GMap.NET.WindowsForms</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378A66C-38E4-46F5-A05F-DC04EF7D4D16}</Project>

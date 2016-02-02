@@ -30,7 +30,7 @@ namespace GMap.NET.MapProviders
          }
       }
 
-      readonly string name = Resources.Strings.BingHybridMap;
+      readonly string name = Resources."BingHybridMap;
       public override string Name
       {
          get

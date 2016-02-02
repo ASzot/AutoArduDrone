@@ -357,13 +357,13 @@ namespace MissionPlanner
                     return _ch3percent;
                 try
                 {
-                    if (MainV2.comPort.MAV.param.ContainsKey("RC3_MIN") &&
-                        MainV2.comPort.MAV.param.ContainsKey("RC3_MAX"))
+                    if (ArduinoInterface.ComPort.MAV.param.ContainsKey("RC3_MIN") &&
+                        ArduinoInterface.ComPort.MAV.param.ContainsKey("RC3_MAX"))
                     {
                         return
                             (int)
-                                (((ch3out - MainV2.comPort.MAV.param["RC3_MIN"].Value)/
-                                  (MainV2.comPort.MAV.param["RC3_MAX"].Value - MainV2.comPort.MAV.param["RC3_MIN"].Value))*
+                                (((ch3out - ArduinoInterface.ComPort.MAV.param["RC3_MIN"].Value)/
+                                  (ArduinoInterface.ComPort.MAV.param["RC3_MAX"].Value - ArduinoInterface.ComPort.MAV.param["RC3_MIN"].Value))*
                                  100);
                     }
                     else
@@ -483,30 +483,6 @@ namespace MissionPlanner
         {
             get { return _climbrate*multiplierspeed; }
             set { _climbrate = value; }
-        }
-
-
-        /// <summary>
-        /// time over target in seconds
-        /// </summary>
-        [DisplayText("Time over Target (sec)")]
-        public int tot
-        {
-            get
-            {
-                if (groundspeed <= 0) return 0;
-                return (int) (wp_dist/groundspeed);
-            }
-        }
-
-        [DisplayText("Time over Home (sec)")]
-        public int toh
-        {
-            get
-            {
-                if (groundspeed <= 0) return 0;
-                return (int) (DistToHome/groundspeed);
-            }
         }
 
         [DisplayText("Dist Traveled (dist)")]
@@ -655,118 +631,6 @@ namespace MissionPlanner
 
         private float _current2;
 
-        public float HomeAlt
-        {
-            get { return (float) HomeLocation.Alt; }
-            set { }
-        }
-
-        static PointLatLngAlt _homelocation = new PointLatLngAlt();
-
-        public PointLatLngAlt HomeLocation
-        {
-            get { return _homelocation; }
-            set { _homelocation = value; }
-        }
-
-        public PointLatLngAlt MovingBase = null;
-
-        static PointLatLngAlt _trackerloc = new PointLatLngAlt();
-
-        public PointLatLngAlt TrackerLocation
-        {
-            get
-            {
-                if (_trackerloc.Lng != 0) return _trackerloc;
-                return HomeLocation;
-            }
-            set { _trackerloc = value; }
-        }
-
-        [DisplayText("Distance to Home (dist)")]
-        public float DistToHome
-        {
-            get
-            {
-                if (lat == 0 && lng == 0 || TrackerLocation.Lat == 0)
-                    return 0;
-
-                // shrinking factor for longitude going to poles direction
-                double rads = Math.Abs(TrackerLocation.Lat)*0.0174532925;
-                double scaleLongDown = Math.Cos(rads);
-                double scaleLongUp = 1.0f/Math.Cos(rads);
-
-                //DST to Home
-                double dstlat = Math.Abs(TrackerLocation.Lat - lat)*111319.5;
-                double dstlon = Math.Abs(TrackerLocation.Lng - lng)*111319.5*scaleLongDown;
-                return (float) Math.Sqrt((dstlat*dstlat) + (dstlon*dstlon))*multiplierdist;
-            }
-        }
-
-        [DisplayText("Distance From Moving Base (dist)")]
-        public float DistFromMovingBase
-        {
-            get
-            {
-                if (lat == 0 && lng == 0 || MovingBase == null)
-                    return 0;
-
-                // shrinking factor for longitude going to poles direction
-                double rads = Math.Abs(MovingBase.Lat)*0.0174532925;
-                double scaleLongDown = Math.Cos(rads);
-                double scaleLongUp = 1.0f/Math.Cos(rads);
-
-                //DST to Home
-                double dstlat = Math.Abs(MovingBase.Lat - lat)*111319.5;
-                double dstlon = Math.Abs(MovingBase.Lng - lng)*111319.5*scaleLongDown;
-                return (float) Math.Sqrt((dstlat*dstlat) + (dstlon*dstlon))*multiplierdist;
-            }
-        }
-
-        [DisplayText("Elevation to Mav (deg)")]
-        public float ELToMAV
-        {
-            get
-            {
-                float dist = DistToHome/multiplierdist;
-
-                if (dist < 5)
-                    return 0;
-
-                float altdiff = (float) (_altasl - TrackerLocation.Alt);
-
-                float angle = (float) Math.Atan(altdiff/dist)*rad2deg;
-
-                return angle;
-            }
-        }
-
-        [DisplayText("Bearing to Mav (deg)")]
-        public float AZToMAV
-        {
-            get
-            {
-                // shrinking factor for longitude going to poles direction
-                double rads = Math.Abs(TrackerLocation.Lat)*0.0174532925;
-                double scaleLongDown = Math.Cos(rads);
-                double scaleLongUp = 1.0f/Math.Cos(rads);
-
-                //DIR to Home
-                double dstlon = (TrackerLocation.Lng - lng); //OffSet_X
-                double dstlat = (TrackerLocation.Lat - lat)*scaleLongUp; //OffSet Y
-                double bearing = 90 + (Math.Atan2(dstlat, -dstlon)*57.295775); //absolut home direction
-                if (bearing < 0) bearing += 360; //normalization
-                //bearing = bearing - 180;//absolut return direction
-                //if (bearing < 0) bearing += 360;//normalization
-
-                float dist = DistToHome/multiplierdist;
-
-                if (dist < 5)
-                    return 0;
-
-                return (float) bearing;
-            }
-        }
 
 
         // pressure
@@ -800,7 +664,6 @@ namespace MissionPlanner
         public float sonarvoltage { get; set; }
 
         // current firmware
-        public MainV2.Firmwares firmware = MainV2.Firmwares.ArduCopter2;
         public float freemem { get; set; }
         public float load { get; set; }
         public float brklevel { get; set; }
@@ -855,39 +718,6 @@ namespace MissionPlanner
                 lastremrssi = DateTime.Now;
                 _remotesnrdb = ((remrssi - remnoise)/1.9f)*0.5f + _remotesnrdb*0.5f;
                 return _remotesnrdb;
-            }
-        }
-
-        [DisplayText("Sik Radio est dist (m)")]
-        public float DistRSSIRemain
-        {
-            get
-            {
-                float work = 0;
-                if (localsnrdb == 0)
-                {
-                    return 0;
-                }
-                if (localsnrdb > remotesnrdb)
-                {
-                    // remote
-                    // minus fade margin
-                    work = remotesnrdb - 5;
-                }
-                else
-                {
-                    // local
-                    // minus fade margin
-                    work = localsnrdb - 5;
-                }
-
-                {
-                    float dist = DistToHome/multiplierdist;
-
-                    work = dist*(float) Math.Pow(2.0, work/6.0);
-                }
-
-                return work;
             }
         }
 
@@ -948,7 +778,7 @@ namespace MissionPlanner
 
         public bool connected
         {
-            get { return (MainV2.comPort.BaseStream.IsOpen || MainV2.comPort.logreadmode); }
+            get { return (ArduinoInterface.ComPort.BaseStream.IsOpen || ArduinoInterface.ComPort.logreadmode); }
         }
 
         bool useLocation = false;
@@ -962,6 +792,8 @@ namespace MissionPlanner
         public float speedup { get; set; }
 
         internal bool MONO = false;
+
+        public static string firmware = "ArduCopter2";
 
         static CurrentState()
         {
@@ -1010,7 +842,6 @@ namespace MissionPlanner
         private DateTime lastupdate = DateTime.Now;
 
         private DateTime lastsecondcounter = DateTime.Now;
-        private PointLatLngAlt lastpos = new PointLatLngAlt();
 
         DateTime lastdata = DateTime.MinValue;
 
@@ -1049,7 +880,7 @@ namespace MissionPlanner
         /// <param name="bs"></param>
         public void UpdateCurrentSettings(System.Windows.Forms.BindingSource bs)
         {
-            UpdateCurrentSettings(bs, false, MainV2.comPort, MainV2.comPort.MAV);
+            UpdateCurrentSettings(bs, false, ArduinoInterface.ComPort, ArduinoInterface.ComPort.MAV);
         }
 
         /// <summary>
@@ -1093,20 +924,6 @@ namespace MissionPlanner
                     if (datetime.Second != lastsecondcounter.Second)
                     {
                         lastsecondcounter = datetime;
-
-                        if (lastpos.Lat != 0 && lastpos.Lng != 0 && armed)
-                        {
-                            if (!mavinterface.BaseStream.IsOpen && !mavinterface.logreadmode)
-                                distTraveled = 0;
-
-                            distTraveled += (float) lastpos.GetDistance(new PointLatLngAlt(lat, lng, 0, ""))*
-                                            multiplierdist;
-                            lastpos = new PointLatLngAlt(lat, lng, 0, "");
-                        }
-                        else
-                        {
-                            lastpos = new PointLatLngAlt(lat, lng, 0, "");
-                        }
 
                         // throttle is up, or groundspeed is > 3 m/s
                         if (ch3percent > 12 || _groundspeed > 3.0)
@@ -1313,27 +1130,27 @@ namespace MissionPlanner
 
                         if (ekfvelv >= 1)
                         {
-                            messageHigh = Strings.ERROR + " " + Strings.velocity_variance;
+                            messageHigh = "ERROR" + " " + "velocity_variance";
                             messageHighTime = DateTime.Now;
                         }
                         if (ekfcompv >= 1)
                         {
-                            messageHigh = Strings.ERROR + " " + Strings.compass_variance;
+                            messageHigh = "ERROR" + " " + "compass_variance";
                             messageHighTime = DateTime.Now;
                         }
                         if (ekfposhor >= 1)
                         {
-                            messageHigh = Strings.ERROR + " " + Strings.pos_horiz_variance;
+                            messageHigh = "ERROR" + " " + "pos_horiz_variance";
                             messageHighTime = DateTime.Now;
                         }
                         if (ekfposvert >= 1)
                         {
-                            messageHigh = Strings.ERROR + " " + Strings.pos_vert_variance;
+                            messageHigh = "ERROR" + " " + "pos_vert_variance";
                             messageHighTime = DateTime.Now;
                         }
                         if (ekfteralt >= 1)
                         {
-                            messageHigh = Strings.ERROR + " " + Strings.terrain_alt_variance;
+                            messageHigh = "ERROR" + " " + "terrain_alt_variance";
                             messageHighTime = DateTime.Now;
                         }
 
@@ -1358,7 +1175,7 @@ namespace MissionPlanner
                                     //case MAVLink.EKF_STATUS_FLAGS.EKF_CONST_POS_MODE:  // never true when absolute - non gps
                                     //case MAVLink.EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_REL: // optical flow
                                     case MAVLink.EKF_STATUS_FLAGS.EKF_PRED_POS_HORIZ_ABS: // ekf has origin - post arm
-                                        //messageHigh = Strings.ERROR + " " + currentflag.ToString().Replace("_", " ");
+                                        //messageHigh = "ERROR + " " + currentflag.ToString().Replace("_", " ");
                                         //messageHighTime = DateTime.Now;
                                         break;
                                     default:
@@ -1421,41 +1238,6 @@ namespace MissionPlanner
 
                             failsafe = hb.system_status == (byte) MAVLink.MAV_STATE.CRITICAL;
 
-                            string oldmode = mode;
-
-                            if ((hb.base_mode & (byte) MAVLink.MAV_MODE_FLAG.CUSTOM_MODE_ENABLED) != 0)
-                            {
-                                // prevent running thsi unless we have to
-                                if (_mode != hb.custom_mode)
-                                {
-                                    List<KeyValuePair<int, string>> modelist = Common.getModesList(this);
-
-                                    bool found = false;
-
-                                    foreach (KeyValuePair<int, string> pair in modelist)
-                                    {
-                                        if (pair.Key == hb.custom_mode)
-                                        {
-                                            mode = pair.Value.ToString();
-                                            _mode = hb.custom_mode;
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!found)
-                                    {
-                                        log.Warn("Mode not found bm:" + hb.base_mode + " cm:" + hb.custom_mode);
-                                        _mode = hb.custom_mode;
-                                    }
-                                }
-                            }
-
-                            if (oldmode != mode && MainV2.speechEnable && MainV2.comPort.MAV.cs == this &&
-                                MainV2.getConfig("speechmodeenabled") == "True")
-                            {
-                                MainV2.speechEngine.SpeakAsync(Common.speechConversion(MainV2.getConfig("speechmode")));
-                            }
                         }
                     }
 
@@ -1481,62 +1263,62 @@ namespace MissionPlanner
 
                         if (sensors_health.gps != sensors_enabled.gps && sensors_present.gps)
                         {
-                            messageHigh = Strings.BadGPSHealth;
+                            messageHigh = "BadGPSHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.gyro != sensors_enabled.gyro && sensors_present.gyro)
                         {
-                            messageHigh = Strings.BadGyroHealth;
+                            messageHigh = "BadGyroHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.accelerometer != sensors_enabled.accelerometer &&
                                  sensors_present.accelerometer)
                         {
-                            messageHigh = Strings.BadAccelHealth;
+                            messageHigh = "BadAccelHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.compass != sensors_enabled.compass && sensors_present.compass)
                         {
-                            messageHigh = Strings.BadCompassHealth;
+                            messageHigh = "BadCompassHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.barometer != sensors_enabled.barometer && sensors_present.barometer)
                         {
-                            messageHigh = Strings.BadBaroHealth;
+                            messageHigh = "BadBaroHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.LASER_POSITION != sensors_enabled.LASER_POSITION &&
                                  sensors_present.LASER_POSITION)
                         {
-                            messageHigh = Strings.BadLiDARHealth;
+                            messageHigh = "BadLiDARHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.optical_flow != sensors_enabled.optical_flow &&
                                  sensors_present.optical_flow)
                         {
-                            messageHigh = Strings.BadOptFlowHealth;
+                            messageHigh = "BadOptFlowHealth";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.terrain != sensors_enabled.terrain && sensors_present.terrain)
                         {
-                            messageHigh = Strings.BadorNoTerrainData;
+                            messageHigh = "BadorNoTerrainData";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.geofence != sensors_enabled.geofence &&
                                  sensors_present.geofence)
                         {
-                            messageHigh = Strings.GeofenceBreach;
+                            messageHigh = "GeofenceBreach";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.ahrs != sensors_enabled.ahrs && sensors_present.ahrs)
                         {
-                            messageHigh = Strings.BadAHRS;
+                            messageHigh = "BadAHRS";
                             messageHighTime = DateTime.Now;
                         }
                         else if (sensors_health.rc_receiver != sensors_enabled.rc_receiver &&
                                  sensors_present.rc_receiver)
                         {
-                            messageHigh = Strings.NORCReceiver;
+                            messageHigh = "NORCReceiver";
                             messageHighTime = DateTime.Now;
                         }
 
@@ -1723,11 +1505,6 @@ namespace MissionPlanner
                             lastautowp = (int) wpno;
                         }
 
-                        if (oldwp != wpno && MainV2.speechEnable && MainV2.comPort.MAV.cs == this &&
-                            MainV2.getConfig("speechwaypointenabled") == "True")
-                        {
-                            MainV2.speechEngine.SpeakAsync(Common.speechConversion(MainV2.getConfig("speechwaypoint")));
-                        }
 
                         //MAVLink.packets[(byte)MAVLink.MSG_NAMES.WAYPOINT_CURRENT] = null;
                     }
@@ -2248,26 +2025,6 @@ namespace MissionPlanner
         public float campointb { get; set; }
 
         public float campointc { get; set; }
-
-        public PointLatLngAlt GimbalPoint { get; set; }
-
-        public float gimballat
-        {
-            get
-            {
-                if (GimbalPoint == null) return 0;
-                return (float) GimbalPoint.Lat;
-            }
-        }
-
-        public float gimballng
-        {
-            get
-            {
-                if (GimbalPoint == null) return 0;
-                return (float) GimbalPoint.Lng;
-            }
-        }
 
 
         public bool landed { get; set; }

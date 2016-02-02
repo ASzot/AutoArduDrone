@@ -68,7 +68,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="adsb.cs" />
     <Compile Include="Attributes\DisplayTextAttribute.cs" />
     <Compile Include="Attributes\PrivateAttribute.cs" />
     <Compile Include="AviWriter.cs" />
@@ -80,14 +79,12 @@
     <Compile Include="CleanDrivers.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="EnumTranslator.cs" />
-    <Compile Include="GeoTiff.cs" />
     <Compile Include="hires.cs" />
     <Compile Include="KIndex.cs" />
     <Compile Include="L10NU.cs" />
     <Compile Include="LangUtility.cs" />
     <Compile Include="locationwp.cs" />
     <Compile Include="MeasureString.cs" />
-    <Compile Include="PointLatLngAlt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -96,11 +93,8 @@
     </Compile>
     <Compile Include="Rect.cs" />
     <Compile Include="Speech.cs" />
-    <Compile Include="srtm.cs" />
     <Compile Include="TCPConsole.cs" />
-    <Compile Include="tfr.cs" />
     <Compile Include="Tracking.cs" />
-    <Compile Include="utmpos.cs" />
     <Compile Include="Vario.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -108,14 +102,6 @@
       <Project>{2A8E8AF5-74E7-49DB-A42E-9360FA7A6CC4}</Project>
       <Name>BaseClasses</Name>
       <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\GeoUtility\GeoUtility.csproj">
-      <Project>{7F7994CE-823F-4A04-BBEA-D0A3808FF56D}</Project>
-      <Name>GeoUtility</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GMap.NET.Core\GMap.NET.Core.csproj">
-      <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
-      <Name>GMap.NET.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mavlink\MAVLink.csproj">
       <Project>{20296734-5f3c-4593-a0d5-dd20b440b13a}</Project>

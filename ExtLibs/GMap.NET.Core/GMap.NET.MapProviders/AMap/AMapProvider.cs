@@ -40,7 +40,7 @@
     {
         private readonly Guid id = new Guid("EF3DD303-3F74-4938-BF40-232D0595EE88");
         public static readonly AMapProvider Instance = new AMapProvider();
-        private readonly string name = Resources.Strings.AMap;
+        private readonly string name = Resources."AMap;
         private static readonly string UrlFormat = "http://webrd04.is.autonavi.com/appmaptile?x={0}&y={1}&z={2}&lang=zh_cn&size=1&scale=1&style=7";
 
         public override PureImage GetTileImage(GPoint pos, int zoom)

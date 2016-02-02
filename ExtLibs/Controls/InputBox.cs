@@ -52,7 +52,7 @@ namespace MissionPlanner.Controls
                 textBox.UseSystemPasswordChar = true;
             MyButton buttonOk = new MyButton();
             MyButton buttonCancel = new MyButton();
-            //System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainV2));
+            //System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainProgram));
             //form.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 
             // Suspend form layout.

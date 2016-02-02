@@ -22,6 +22,9 @@ using MissionPlanner.Mavlink;
 
 namespace MissionPlanner
 {
+    /// <summary>
+    /// This is the protocol for communicating with the ArduPilot
+    /// </summary>
     public class MAVLinkInterface : MAVLink, IDisposable
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -55,8 +58,6 @@ namespace MissionPlanner
         string buildplaintxtline = "";
 
         public bool ReadOnly = false;
-
-        public TerrainFollow Terrain;
 
         public event ProgressEventHandler Progress;
 
@@ -268,7 +269,7 @@ namespace MissionPlanner
             frmProgressReporter = new ProgressReporterDialogue
             {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
-                Text = Strings.ConnectingMavlink
+                Text = "ConnectingMavlink"
             };
 
             if (getparams)
@@ -279,8 +280,7 @@ namespace MissionPlanner
             {
                 frmProgressReporter.DoWork += FrmProgressReporterDoWorkNOParams;
             }
-            frmProgressReporter.UpdateProgressAndStatus(-1, Strings.MavlinkConnecting);
-            ThemeManager.ApplyThemeTo(frmProgressReporter);
+            frmProgressReporter.UpdateProgressAndStatus(-1, "MavlinkConnecting");
 
             frmProgressReporter.RunBackgroundOperationAsync();
 
@@ -304,14 +304,13 @@ namespace MissionPlanner
 
         private void OpenBg(object PRsender, bool getparams, ProgressWorkerEventArgs progressWorkerEventArgs)
         {
-            frmProgressReporter.UpdateProgressAndStatus(-1, Strings.MavlinkConnecting);
+            frmProgressReporter.UpdateProgressAndStatus(-1, "MavlinkConnecting");
 
             giveComport = true;
 
             // allow settings to settle - previous dtr 
             System.Threading.Thread.Sleep(1000);
 
-            Terrain = new TerrainFollow(this);
 
             bool hbseen = false;
 
@@ -341,7 +340,7 @@ namespace MissionPlanner
                 countDown.Elapsed += (sender, e) =>
                 {
                     int secondsRemaining = (deadline - e.SignalTime).Seconds;
-                    frmProgressReporter.UpdateProgressAndStatus(-1, string.Format(Strings.Trying, secondsRemaining));
+                    frmProgressReporter.UpdateProgressAndStatus(-1, string.Format("Trying", secondsRemaining));
                     if (secondsRemaining > 0) countDown.Start();
                 };
                 countDown.Start();
@@ -374,8 +373,8 @@ namespace MissionPlanner
 
                         if (hbseen)
                         {
-                            progressWorkerEventArgs.ErrorMessage = Strings.Only1Hb;
-                            throw new Exception(Strings.Only1HbD);
+                            progressWorkerEventArgs.ErrorMessage = "Only1Hb";
+                            throw new Exception("Only1HbD");
                         }
                         else
                         {
@@ -477,13 +476,13 @@ Please check the following
                 }
                 giveComport = false;
                 if (string.IsNullOrEmpty(progressWorkerEventArgs.ErrorMessage))
-                    progressWorkerEventArgs.ErrorMessage = Strings.ConnectFailed;
+                    progressWorkerEventArgs.ErrorMessage = "ConnectFailed";
                 log.Error(e);
                 throw;
             }
             //frmProgressReporter.Close();
             giveComport = false;
-            frmProgressReporter.UpdateProgressAndStatus(100, Strings.Done);
+            frmProgressReporter.UpdateProgressAndStatus(100, "Done");
             log.Info("Done open " + MAV.sysid + " " + MAV.compid);
             MAV.packetslost = 0;
             MAV.synclost = 0;
@@ -498,7 +497,7 @@ Please check the following
             MAV.aptype = (MAV_TYPE) hb.type;
             MAV.apname = (MAV_AUTOPILOT) hb.autopilot;
 
-            setAPType(sysid, compid);
+            //setAPType(sysid, compid);
 
             MAV.sysid = sysid;
             MAV.compid = compid;
@@ -817,24 +816,6 @@ Please check the following
 
         public void getParamList()
         {
-            frmProgressReporter = new ProgressReporterDialogue
-            {
-                StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
-                Text = Strings.GettingParams + " " + sysidcurrent
-            };
-
-            frmProgressReporter.DoWork += FrmProgressReporterGetParams;
-            frmProgressReporter.UpdateProgressAndStatus(-1, Strings.GettingParamsD);
-            ThemeManager.ApplyThemeTo(frmProgressReporter);
-
-            frmProgressReporter.RunBackgroundOperationAsync();
-
-            frmProgressReporter.Dispose();
-
-            if (ParamListChanged != null)
-            {
-                ParamListChanged(this, null);
-            }
         }
 
         void FrmProgressReporterGetParams(object sender, ProgressWorkerEventArgs e, object passdata = null)
@@ -976,9 +957,6 @@ Please check the following
 
                         //Console.WriteLine(DateTime.Now.Millisecond + " gp2 ");
 
-                        if (!MainV2.MONO)
-                            log.Info(DateTime.Now.Millisecond + " got param " + (par.param_index) + " of " +
-                                     (par.param_count) + " name: " + paramID);
 
                         //Console.WriteLine(DateTime.Now.Millisecond + " gp2a ");
 
@@ -1002,7 +980,7 @@ Please check the following
                         //Console.WriteLine(DateTime.Now.Millisecond + " gp3 ");
 
                         this.frmProgressReporter.UpdateProgressAndStatus((indexsreceived.Count*100)/param_total,
-                            Strings.Gotparam + paramID);
+                            "Gotparam" + paramID);
 
                         // we hit the last param - lets escape eq total = 176 index = 0-175
                         if (par.param_index == (param_total - 1))
@@ -1344,10 +1322,22 @@ Please check the following
         public bool doMotorTest(int motor, MAVLink.MOTOR_TEST_THROTTLE_TYPE thr_type, int throttle, int timeout)
         {
             // THIS IS THE PART OF CODE THAT RUNS THE MOTORS.
-            return MainV2.comPort.doCommand(MAVLink.MAV_CMD.DO_MOTOR_TEST, (float) motor, (float) (byte) thr_type,
+            return ArduinoInterface.ComPort.doCommand(MAVLink.MAV_CMD.DO_MOTOR_TEST, (float) motor, (float) (byte) thr_type,
                 (float) throttle, (float) timeout, 0, 0, 0);
         }
 
+        /// <summary>
+        /// Sends the commands to the ArduPilot.
+        /// </summary>
+        /// <param name="actionid"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p3"></param>
+        /// <param name="p4"></param>
+        /// <param name="p5"></param>
+        /// <param name="p6"></param>
+        /// <param name="p7"></param>
+        /// <returns></returns>
         public bool doCommand(MAV_CMD actionid, float p1, float p2, float p3, float p4, float p5, float p6, float p7)
         {
             giveComport = true;
@@ -2289,7 +2279,7 @@ Please check the following
 
             generatePacket((byte) MAVLINK_MSG_ID.DIGICAM_CONTROL, req);
 
-            MainV2.comPort.doCommand(MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0);
+            ArduinoInterface.ComPort.doCommand(MAV_CMD.DO_DIGICAM_CONTROL, 0, 0, 0, 0, 1, 0, 0);
 
             //MAVLINK_MSG_ID.CAMERA_FEEDBACK;
 
@@ -2740,8 +2730,8 @@ Please check the following
                         {
                             var adsb = buffer.ByteArrayToStructure<MAVLink.mavlink_adsb_vehicle_t>(6);
 
-                            MainV2.instance.adsbPlanes[adsb.ICAO_address.ToString("X5")] = new MissionPlanner.Utilities.adsb.PointLatLngAltHdg(adsb.lat / 1e7, adsb.lon / 1e7, adsb.altitude / 1000, adsb.heading, adsb.ICAO_address.ToString("X5"));
-                            MainV2.instance.adsbPlaneAge[adsb.ICAO_address.ToString("X5")] = DateTime.Now;
+                            //MainProgram.instance.adsbPlanes[adsb.ICAO_address.ToString("X5")] = new MissionPlanner.Utilities.adsb.PointLatLngAltHdg(adsb.lat / 1e7, adsb.lon / 1e7, adsb.altitude / 1000, adsb.heading, adsb.ICAO_address.ToString("X5"));
+                            //MainProgram.instance.adsbPlaneAge[adsb.ICAO_address.ToString("X5")] = DateTime.Now;
                         }
                     }
 
@@ -2760,7 +2750,7 @@ Please check the following
                                 MAVlist.Create(sysid, compid);
                                 MAVlist[sysid, compid].aptype = (MAV_TYPE) hb.type;
                                 MAVlist[sysid, compid].apname = (MAV_AUTOPILOT) hb.autopilot;
-                                setAPType(sysid, compid);
+                                //setAPType(sysid, compid);
                             }
 
                             // attach to the only remote device. / default to first device seen
@@ -2820,13 +2810,6 @@ Please check the following
                             MAVlist[sysid, compid].cs.messageHigh = logdata;
                             MAVlist[sysid, compid].cs.messageHighTime = DateTime.Now;
 
-                            if (MainV2.speechEngine != null &&
-                                MainV2.speechEngine.State == System.Speech.Synthesis.SynthesizerState.Ready &&
-                                MainV2.config["speechenable"] != null &&
-                                MainV2.config["speechenable"].ToString() == "True")
-                            {
-                                MainV2.speechEngine.SpeakAsync(logdata);
-                            }
                         }
                     }
 
@@ -3099,62 +3082,6 @@ Please check the following
                         giveComport = false;
 
                         return true;
-                    }
-                }
-            }
-        }
-
-        public PointLatLngAlt getFencePoint(int no, ref int total)
-        {
-            byte[] buffer;
-
-            giveComport = true;
-
-            PointLatLngAlt plla = new PointLatLngAlt();
-            mavlink_fence_fetch_point_t req = new mavlink_fence_fetch_point_t();
-
-            req.idx = (byte) no;
-            req.target_component = MAV.compid;
-            req.target_system = MAV.sysid;
-
-            // request point
-            generatePacket((byte) MAVLINK_MSG_ID.FENCE_FETCH_POINT, req);
-
-            DateTime start = DateTime.Now;
-            int retrys = 3;
-
-            while (true)
-            {
-                if (!(start.AddMilliseconds(700) > DateTime.Now))
-                {
-                    if (retrys > 0)
-                    {
-                        log.Info("getFencePoint Retry " + retrys + " - giv com " + giveComport);
-                        generatePacket((byte) MAVLINK_MSG_ID.FENCE_FETCH_POINT, req);
-                        start = DateTime.Now;
-                        retrys--;
-                        continue;
-                    }
-                    giveComport = false;
-                    throw new Exception("Timeout on read - getFencePoint");
-                }
-
-                buffer = readPacket();
-                if (buffer.Length > 5)
-                {
-                    if (buffer[5] == (byte) MAVLINK_MSG_ID.FENCE_POINT)
-                    {
-                        giveComport = false;
-
-                        mavlink_fence_point_t fp = buffer.ByteArrayToStructure<mavlink_fence_point_t>(6);
-
-                        plla.Lat = fp.lat;
-                        plla.Lng = fp.lng;
-                        plla.Tag = fp.idx.ToString();
-
-                        total = fp.count;
-
-                        return plla;
                     }
                 }
             }
@@ -3442,158 +3369,6 @@ Please check the following
             generatePacket((byte) MAVLINK_MSG_ID.LOG_ERASE, req);
         }
 
-        public List<PointLatLngAlt> getRallyPoints()
-        {
-            List<PointLatLngAlt> points = new List<PointLatLngAlt>();
-
-            if (!MAV.param.ContainsKey("RALLY_TOTAL"))
-                return points;
-
-            int count = int.Parse(MAV.param["RALLY_TOTAL"].ToString());
-
-            for (int a = 0; a < (count - 1); a++)
-            {
-                try
-                {
-                    PointLatLngAlt plla = getRallyPoint(a, ref count);
-                    points.Add(plla);
-                }
-                catch
-                {
-                    return points;
-                }
-            }
-
-            return points;
-        }
-
-        public PointLatLngAlt getRallyPoint(int no, ref int total)
-        {
-            byte[] buffer;
-
-            giveComport = true;
-
-            PointLatLngAlt plla = new PointLatLngAlt();
-            mavlink_rally_fetch_point_t req = new mavlink_rally_fetch_point_t();
-
-            req.idx = (byte) no;
-            req.target_component = MAV.compid;
-            req.target_system = MAV.sysid;
-
-            // request point
-            generatePacket((byte) MAVLINK_MSG_ID.RALLY_FETCH_POINT, req);
-
-            DateTime start = DateTime.Now;
-            int retrys = 3;
-
-            while (true)
-            {
-                if (!(start.AddMilliseconds(700) > DateTime.Now))
-                {
-                    if (retrys > 0)
-                    {
-                        log.Info("getRallyPoint Retry " + retrys + " - giv com " + giveComport);
-                        generatePacket((byte) MAVLINK_MSG_ID.FENCE_FETCH_POINT, req);
-                        start = DateTime.Now;
-                        retrys--;
-                        continue;
-                    }
-                    giveComport = false;
-                    throw new Exception("Timeout on read - getRallyPoint");
-                }
-
-                buffer = readPacket();
-                if (buffer.Length > 5)
-                {
-                    if (buffer[5] == (byte) MAVLINK_MSG_ID.RALLY_POINT)
-                    {
-                        mavlink_rally_point_t fp = buffer.ByteArrayToStructure<mavlink_rally_point_t>(6);
-
-                        if (req.idx != fp.idx)
-                        {
-                            generatePacket((byte) MAVLINK_MSG_ID.FENCE_FETCH_POINT, req);
-                            continue;
-                        }
-
-                        plla.Lat = fp.lat/t7;
-                        plla.Lng = fp.lng/t7;
-                        plla.Tag = fp.idx.ToString();
-                        plla.Alt = fp.alt;
-
-                        total = fp.count;
-
-                        giveComport = false;
-
-                        return plla;
-                    }
-                }
-            }
-        }
-
-        public bool setFencePoint(byte index, PointLatLngAlt plla, byte fencepointcount)
-        {
-            mavlink_fence_point_t fp = new mavlink_fence_point_t();
-
-            fp.idx = index;
-            fp.count = fencepointcount;
-            fp.lat = (float) plla.Lat;
-            fp.lng = (float) plla.Lng;
-            fp.target_component = MAV.compid;
-            fp.target_system = MAV.sysid;
-
-            int retry = 3;
-
-            PointLatLngAlt newfp;
-
-            while (retry > 0)
-            {
-                generatePacket((byte) MAVLINK_MSG_ID.FENCE_POINT, fp);
-                int counttemp = 0;
-                newfp = getFencePoint(fp.idx, ref counttemp);
-
-                if (newfp.GetDistance(plla) < 5)
-                    return true;
-                retry--;
-            }
-
-            throw new Exception("Could not verify GeoFence Point");
-        }
-
-        public bool setRallyPoint(byte index, PointLatLngAlt plla, short break_alt, UInt16 land_dir_cd, byte flags,
-            byte rallypointcount)
-        {
-            mavlink_rally_point_t rp = new mavlink_rally_point_t();
-
-            rp.idx = index;
-            rp.count = rallypointcount;
-            rp.lat = (int) (plla.Lat*t7);
-            rp.lng = (int) (plla.Lng*t7);
-            rp.alt = (short) plla.Alt;
-            rp.break_alt = break_alt;
-            rp.land_dir = land_dir_cd;
-            rp.flags = (byte) flags;
-            rp.target_component = MAV.compid;
-            rp.target_system = MAV.sysid;
-
-            int retry = 3;
-
-            while (retry > 0)
-            {
-                generatePacket((byte) MAVLINK_MSG_ID.RALLY_POINT, rp);
-                int counttemp = 0;
-                PointLatLngAlt newfp = getRallyPoint(rp.idx, ref counttemp);
-
-                if (newfp.Lat == plla.Lat && newfp.Lng == rp.lng)
-                {
-                    Console.WriteLine("Rally Set");
-                    return true;
-                }
-                retry--;
-            }
-
-            return false;
-        }
-
         public enum sensoroffsetsenum
         {
             gyro = 0,
@@ -3677,110 +3452,7 @@ Please check the following
             if (modein == null || modein == "")
                 return false;
 
-            try
-            {
-                List<KeyValuePair<int, string>> modelist = Common.getModesList(MAV.cs);
-
-                foreach (KeyValuePair<int, string> pair in modelist)
-                {
-                    if (pair.Value.ToLower() == modein.ToLower())
-                    {
-                        mode.base_mode = (byte) MAVLink.MAV_MODE_FLAG.CUSTOM_MODE_ENABLED;
-                        mode.custom_mode = (uint) pair.Key;
-                    }
-                }
-
-                if (mode.base_mode == 0)
-                {
-                    MessageBox.Show("No Mode Changed " + modein);
-                    return false;
-                }
-            }
-            catch
-            {
-                System.Windows.Forms.MessageBox.Show("Failed to find Mode");
-                return false;
-            }
-
             return true;
-        }
-
-        public void setAPType(byte sysid, byte compid)
-        {
-            MAVlist[sysid, compid].sysid = sysid;
-            MAVlist[sysid, compid].compid = compid;
-
-            switch (MAVlist[sysid, compid].apname)
-            {
-                case MAV_AUTOPILOT.ARDUPILOTMEGA:
-                    switch (MAVlist[sysid, compid].aptype)
-                    {
-                        case MAVLink.MAV_TYPE.FIXED_WING:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduPlane;
-                            break;
-                        case MAVLink.MAV_TYPE.QUADROTOR:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduCopter2;
-                            break;
-                        case MAVLink.MAV_TYPE.TRICOPTER:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduCopter2;
-                            break;
-                        case MAVLink.MAV_TYPE.HEXAROTOR:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduCopter2;
-                            break;
-                        case MAVLink.MAV_TYPE.OCTOROTOR:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduCopter2;
-                            break;
-                        case MAVLink.MAV_TYPE.HELICOPTER:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduCopter2;
-                            break;
-                        case MAVLink.MAV_TYPE.GROUND_ROVER:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduRover;
-                            break;
-                        case MAV_TYPE.ANTENNA_TRACKER:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduTracker;
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case MAV_AUTOPILOT.UDB:
-                    switch (MAVlist[sysid, compid].aptype)
-                    {
-                        case MAVLink.MAV_TYPE.FIXED_WING:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.ArduPlane;
-                            break;
-                    }
-                    break;
-                case MAV_AUTOPILOT.GENERIC:
-                    switch (MAVlist[sysid, compid].aptype)
-                    {
-                        case MAVLink.MAV_TYPE.FIXED_WING:
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.Ateryx;
-                            break;
-                    }
-                    break;
-                default:
-                    switch (MAVlist[sysid, compid].aptype)
-                    {
-                        case MAV_TYPE.GIMBAL: // storm32 - name 83
-                            MAVlist[sysid, compid].cs.firmware = MainV2.Firmwares.Gymbal;
-                            break;
-                    }
-                    break;
-            }
-
-            switch (MAVlist[sysid, compid].cs.firmware)
-            {
-                case MainV2.Firmwares.ArduCopter2:
-                    MAVlist[sysid, compid].Guid = MainV2.config["copter_guid"].ToString();
-                    break;
-                case MainV2.Firmwares.ArduPlane:
-                    MAVlist[sysid, compid].Guid = MainV2.config["plane_guid"].ToString();
-                    break;
-                case MainV2.Firmwares.ArduRover:
-                    MAVlist[sysid, compid].Guid = MainV2.config["rover_guid"].ToString();
-                    break;
-            }
         }
 
         public override string ToString()
@@ -3803,7 +3475,6 @@ Please check the following
                 _bytesSentSubj.Dispose();
             this.Close();
 
-            Terrain = null;
 
             MirrorStream = null;
 
