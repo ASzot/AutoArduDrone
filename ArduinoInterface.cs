@@ -69,13 +69,18 @@ namespace MissionPlanner
             _serialThreadActive = false;
         }
 
-        public static void Disconnect(MAVLinkInterface comPort)
+        public void Disconnect(MAVLinkInterface comPort)
         {
             comPort.BaseStream.DtrEnable = false;
             comPort.Close();
         }
 
-        public static void Connect(MAVLinkInterface comPort, string portname, string baud)
+        public bool RunMotor(int motorNum, int throttle, int timeout)
+        {
+            return ComPort.doMotorTest(motorNum, MAVLink.MOTOR_TEST_THROTTLE_TYPE.MOTOR_TEST_THROTTLE_PERCENT, throttle, timeout);
+        }
+
+        public void Connect(MAVLinkInterface comPort, string portname, string baud)
         {
             switch (portname)
             {

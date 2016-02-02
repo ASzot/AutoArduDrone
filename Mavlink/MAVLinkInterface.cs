@@ -2557,8 +2557,9 @@ Please check the following
             // update bps statistics
             if (bpstime.Second != DateTime.Now.Second && !logreadmode && BaseStream.IsOpen)
             {
-                Console.Write("bps {0} loss {1} left {2} mem {3}      \n", bps1, MAV.synclost, BaseStream.BytesToRead,
-                    System.GC.GetTotalMemory(false)/1024/1024.0);
+                // Diagnostic connection message.
+                //Console.Write("bps {0} loss {1} left {2} mem {3}      \n", bps1, MAV.synclost, BaseStream.BytesToRead,
+                //    System.GC.GetTotalMemory(false) / 1024 / 1024.0);
                 bps2 = bps1; // prev sec
                 bps1 = 0; // current sec
                 bpstime = DateTime.Now;

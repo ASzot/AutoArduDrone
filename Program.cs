@@ -52,6 +52,50 @@ namespace MissionPlanner
                 string[] allPorts = ardu.GetAllPortNames();
                 Print(allPorts);
             }
+            else if (command == "connect")
+            {
+                ardu.Connect(ArduinoInterface.ComPort, "COM5", "115200");
+                Print("Connected");
+            }
+            else if (command == "disconnect")
+            {
+                ardu.Disconnect(ArduinoInterface.ComPort);
+                Print("Disconnected");
+            }
+            else if (command == "motors")
+            {
+                Print("Throttle %: ");
+                string input = Console.ReadLine();
+                int throttle = int.Parse(input);
+
+                Print("Timeout: ");
+                input = Console.ReadLine();
+                int time = int.Parse(input);
+
+                for (int i = 1; i < 5; ++i)
+                {
+                    PrintRet("Running motor " + i.ToString());
+                    if (!ardu.RunMotor(i, throttle, time))
+                        Console.WriteLine("Command denied");
+                }
+            }
+            else if (command == "motor")
+            {
+                Print("Motor #: ");
+                string input = Console.ReadLine();
+                int motor = int.Parse(input);
+
+                Print("Throttle %: ");
+                input = Console.ReadLine();
+                int throttle = int.Parse(input);
+
+                Print("Timeout: ");
+                input = Console.ReadLine();
+                int time = int.Parse(input);
+
+                if (!ardu.RunMotor(motor, throttle, time))
+                    Console.WriteLine("Command denied");
+            }
         }
 
         private static void PrintHelp()
@@ -62,6 +106,10 @@ namespace MissionPlanner
             PrintRet("quit - quit the program");
             PrintRet("**Ardu Controls");
             PrintRet("printcom - print com options");
+            PrintRet("connect");
+            PrintRet("disconnect");
+            PrintRet("motor");
+            PrintRet("motors");
             Return();
             Return();
         }
