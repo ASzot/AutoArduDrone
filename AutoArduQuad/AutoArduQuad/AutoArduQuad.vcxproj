@@ -60,15 +60,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\AutoArduQuad.ino" />
+    <ClInclude Include="ArduinoCore\Output\Motors.h" />
+    <ClInclude Include="ArduinoCore\Output\SerialHelper.h" />
+    <ClInclude Include="ArduinoCore\Sensors\MPU.h" />
+    <ClInclude Include="LogicCore\QuadController.h" />
+    <ClInclude Include="LogicCore\Components\Sensors.h" />
+    <ClInclude Include="LogicCore\Components\MotorMgr.h" />
+    <ClInclude Include="MotorMgr.h" />
+    <ClInclude Include="Motors.h" />
+    <ClInclude Include="MPU.h" />
+    <ClInclude Include="QuadController.h" />
+    <ClInclude Include="Sensors.h" />
+    <ClInclude Include="SerialHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Motors.cpp" />
-    <ClCompile Include="..\..\MPU.cpp" />
+    <ClCompile Include="MotorMgr.cpp" />
+    <ClCompile Include="Motors.cpp" />
+    <ClCompile Include="MPU.cpp" />
+    <ClCompile Include="QuadController.cpp" />
+    <ClCompile Include="Sensors.cpp" />
+    <ClCompile Include="SerialHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Motors.h" />
-    <ClInclude Include="..\..\MPU.h" />
+    <None Include="AutoArduQuad.ino" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

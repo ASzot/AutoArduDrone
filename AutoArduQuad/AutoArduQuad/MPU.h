@@ -1,5 +1,4 @@
-#ifndef MPU_H
-#define MPU_H
+#pragma once 
 
 #include <stdint.h>
 
@@ -24,7 +23,6 @@ public:
 	void PrintDebugStr();
 
 	double YPR[3];
-	bool ShowAll;
 private:
 	double* CalculateYPR();
 
@@ -36,5 +34,3 @@ private:
 	int _mpuStatus;
 	uint16_t _fifoCount;     // count of all bytes currently in FIFO
 };
-
-#endif

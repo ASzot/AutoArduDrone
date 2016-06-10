@@ -15,24 +15,66 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\AutoArduQuad.ino">
+    <ClInclude Include="ArduinoCore\Output\Motors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArduinoCore\Output\SerialHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArduinoCore\Sensors\MPU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicCore\QuadController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicCore\Components\Sensors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicCore\Components\MotorMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MotorMgr.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Motors.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MPU.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadController.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sensors.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SerialHelper.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MotorMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Motors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MPU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sensors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SerialHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AutoArduQuad.ino">
       <Filter>Source Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Motors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\MPU.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Motors.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MPU.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

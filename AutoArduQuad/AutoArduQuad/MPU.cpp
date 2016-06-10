@@ -18,8 +18,6 @@ MPU::MPU()
 	_calibrationYPR = new double[3];
 	for (int i = 0; i < 3; ++i)
 		_calibrationYPR[i] = 0.0;
-
-	ShowAll = false;
 }
 
 bool MPU::Init()
