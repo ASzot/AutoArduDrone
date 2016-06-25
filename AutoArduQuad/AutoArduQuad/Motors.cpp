@@ -1,4 +1,5 @@
 #include "Motors.h"
+#include "SerialHelper.h"
 
 Motors::Motors() 
 {
@@ -19,7 +20,7 @@ void Motors::Init()
 	_westESC.attach(6);
 
 	// Send a zero command to each ESC
-	StopAll();
+	WriteAll(700);
 	ArmMotors();
 }
 
@@ -96,17 +97,18 @@ void Motors::SetEW(int base, int offset)
 // ESC to find a value that is safely within the zero range.
 void Motors::StopAll()
 {
-	_northESC.writeMicroseconds(700);
-	_eastESC.writeMicroseconds(700);
-	_southESC.writeMicroseconds(700);
-	_westESC.writeMicroseconds(700);
+	WriteAll(800);
 }
 
 void Motors::ArmMotors() 
 {
-	_northESC.writeMicroseconds(750);
-	_eastESC.writeMicroseconds(750);
-	_southESC.writeMicroseconds(750);
-	_westESC.writeMicroseconds(750);
+	WriteAll(750);
 }
 
+void Motors::WriteAll(int val)
+{
+	_northESC.writeMicroseconds(val);
+	_eastESC.writeMicroseconds(val);
+	_southESC.writeMicroseconds(val);
+	_westESC.writeMicroseconds(val);
+}

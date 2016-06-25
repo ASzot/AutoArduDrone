@@ -19,12 +19,23 @@ namespace SerialHelper
 		Serial.print(str);
 	}
 
+	void Print(const char* str)
+	{
+		Serial.print(str);
+	}
+
 	void Print(double d)
 	{
 		Serial.print(d);
 	}
 
 	void Println(char *str)
+	{
+		Print(str);
+		Println();
+	}
+
+	void Println(const char* str)
 	{
 		Print(str);
 		Println();

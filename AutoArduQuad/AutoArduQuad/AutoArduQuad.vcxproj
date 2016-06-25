@@ -69,6 +69,7 @@
     <ClInclude Include="MotorMgr.h" />
     <ClInclude Include="Motors.h" />
     <ClInclude Include="MPU.h" />
+    <ClInclude Include="PID.h" />
     <ClInclude Include="QuadController.h" />
     <ClInclude Include="Sensors.h" />
     <ClInclude Include="SerialHelper.h" />
@@ -77,6 +78,7 @@
     <ClCompile Include="MotorMgr.cpp" />
     <ClCompile Include="Motors.cpp" />
     <ClCompile Include="MPU.cpp" />
+    <ClCompile Include="PID.cpp" />
     <ClCompile Include="QuadController.cpp" />
     <ClCompile Include="Sensors.cpp" />
     <ClCompile Include="SerialHelper.cpp" />

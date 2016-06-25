@@ -22,7 +22,7 @@ public:
 
 	void PrintDebugStr();
 
-	double YPR[3];
+	double* YPR;
 private:
 	double* CalculateYPR();
 

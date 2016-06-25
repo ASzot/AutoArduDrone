@@ -21,6 +21,7 @@ public:
 	void StopAll();
 protected:
 	void ArmMotors();
+	void WriteAll(int val);
 
 	Servo _northESC;
 	Servo _eastESC;

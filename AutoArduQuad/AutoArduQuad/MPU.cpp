@@ -3,6 +3,7 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "Wire.h"
+#include "SerialHelper.h"
 
 MPU6050 _mpu;
 
@@ -18,6 +19,10 @@ MPU::MPU()
 	_calibrationYPR = new double[3];
 	for (int i = 0; i < 3; ++i)
 		_calibrationYPR[i] = 0.0;
+
+	YPR = new double[3];
+	for (int i = 0; i < 3; ++i)
+		YPR[i] = 0.0;
 }
 
 bool MPU::Init()
@@ -29,12 +34,6 @@ bool MPU::Init()
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
     #endif
-
-    _mpu.initialize();
-	
-    _mpu.setXGyroOffset(220);
-    _mpu.setYGyroOffset(76);
-    _mpu.setZGyroOffset(-85);
 
     _mpu.initialize();
 	if (!_mpu.testConnection())

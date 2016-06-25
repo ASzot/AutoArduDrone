@@ -1,11 +1,13 @@
 #include "QuadController.h"
+#include "SerialHelper.h"
 
 QuadController g_quadController;
 bool failed = false;
 
 void setup()
 {
-	//failed = !g_quadController->Init();
+	SerialHelper::Println("Starting");
+	failed = !g_quadController.Init();
 }
 
 void loop()
@@ -13,5 +15,5 @@ void loop()
 	if (failed)
 		return;
 
-	//g_quadController->Update();
+	g_quadController.Update();
 }
