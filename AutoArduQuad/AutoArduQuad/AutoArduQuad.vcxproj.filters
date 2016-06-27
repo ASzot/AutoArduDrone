@@ -54,6 +54,9 @@
     <ClInclude Include="PID.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MotorMgr.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

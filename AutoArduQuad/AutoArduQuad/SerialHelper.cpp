@@ -29,6 +29,16 @@ namespace SerialHelper
 		Serial.print(d);
 	}
 
+	void Print(long l)
+	{
+		Serial.print(l);
+	}
+
+	void Print(unsigned long l)
+	{
+		Serial.print(l);
+	}
+
 	void Println(char *str)
 	{
 		Print(str);
@@ -41,7 +51,19 @@ namespace SerialHelper
 		Println();
 	}
 
-	void  Println(double d)
+	void Println(long l)
+	{
+		Print(l);
+		Println();
+	}
+
+	void Println(unsigned long l)
+	{
+		Print(l);
+		Println();
+	}
+
+	void Println(double d)
 	{
 		Print(d);
 		Println();

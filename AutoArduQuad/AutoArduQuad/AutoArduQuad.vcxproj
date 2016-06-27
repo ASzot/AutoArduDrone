@@ -63,6 +63,7 @@
     <ClInclude Include="ArduinoCore\Output\Motors.h" />
     <ClInclude Include="ArduinoCore\Output\SerialHelper.h" />
     <ClInclude Include="ArduinoCore\Sensors\MPU.h" />
+    <ClInclude Include="Common.h" />
     <ClInclude Include="LogicCore\QuadController.h" />
     <ClInclude Include="LogicCore\Components\Sensors.h" />
     <ClInclude Include="LogicCore\Components\MotorMgr.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="SerialHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common.cpp" />
     <ClCompile Include="MotorMgr.cpp" />
     <ClCompile Include="Motors.cpp" />
     <ClCompile Include="MPU.cpp" />

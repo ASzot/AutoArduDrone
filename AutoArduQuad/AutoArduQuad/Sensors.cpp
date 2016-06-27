@@ -1,10 +1,12 @@
 #include "Sensors.h"
 #include "SerialHelper.h"
+#include <Arduino.h>
 
 
 Sensors::Sensors(void)
 {
 	_mpu = new MPU();
+	_lastTime = 0.0;
 }
 
 
@@ -33,6 +35,17 @@ void Sensors::ZeroAll()
 void Sensors::Update()
 {
 	_mpu->Update();
+}
+
+bool Sensors::UpdateCal(unsigned long time)
+{
+	unsigned long dTime = time - _lastTime;
+	_lastTime = time;
+
+	if (_mpu->UpdateCal(dTime))
+		return true;
+
+	return false;
 }
 
 MPU* Sensors::GetMPU()

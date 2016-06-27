@@ -15,5 +15,7 @@ void loop()
 	if (failed)
 		return;
 
-	g_quadController.Update();
+	unsigned long time = millis();
+
+	g_quadController.Update(time);
 }

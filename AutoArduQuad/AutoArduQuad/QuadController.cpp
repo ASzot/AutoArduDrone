@@ -7,6 +7,7 @@ QuadController::QuadController()
 	_sensors = new Sensors();
 	_motorMgr = new MotorMgr();
 	_run = false;
+	_systemsCalibrated = false;
 }
 
 
@@ -19,9 +20,22 @@ QuadController::~QuadController()
 	_motorMgr = 0;
 }
 
-void QuadController::Update()
+void QuadController::Update(unsigned long time)
 {
-	_sensors->Update();
+	if (!_systemsCalibrated)
+	{
+		if (_sensors->UpdateCal(time))
+		{
+			_systemsCalibrated = true;
+			SerialHelper::Println("Systems Calibrated.");
+		}
+		return;
+	}
+	else
+	{
+		_sensors->Update();
+	}
+
 	if (_run)
 	{
 		_motorMgr->Update();
@@ -33,6 +47,11 @@ void QuadController::Update()
 bool QuadController::Init()
 {
 	SerialHelper::Start();
+	SerialHelper::Println("Press any key to start");
+	while (!SerialHelper::Avaliable())
+	{
+		// Do nothing. 
+	}
 
 	if (!_sensors->Init())
 	{
@@ -47,6 +66,7 @@ bool QuadController::Init()
 	}
 
 	SerialHelper::Println("Init successful");
+	SerialHelper::Println("Calibrating Systems...");
 	return true;
 }
 

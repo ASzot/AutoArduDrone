@@ -52,7 +52,7 @@ bool MotorMgr::Init(MPU* mpu)
 	_ypr2 = &mpu->YPR[2];
 
 	_nsController = new PID(&mpu->YPR[2], &_nsOut, &_setNS, 7, 0.0, 1.1, REVERSE);
-	_ewController = new PID(&mpu->YPR[1], &_ewOut, &_setEW, 10.0, 0.06, 1.5, REVERSE);
+	_ewController = new PID(&mpu->YPR[1], &_ewOut, &_setEW, 10.0, 0.0, 1.5, REVERSE);
 	_yawController = new PID(&mpu->YPR[0], &_yawOut, &_setYaw, 2.0, 0.0, 0.0, DIRECT);
 	
 	_ewController->SetMode(AUTOMATIC);

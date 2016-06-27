@@ -9,6 +9,7 @@ public:
 
 	bool Init();
 
+	bool UpdateCal(unsigned long dTime);
 	void Update();
 
 	double GetNS();
@@ -33,4 +34,6 @@ private:
 	bool _dmpReady;
 	int _mpuStatus;
 	uint16_t _fifoCount;     // count of all bytes currently in FIFO
+	unsigned long _totalSampleTime;
+	double* _lastYPR;
 };

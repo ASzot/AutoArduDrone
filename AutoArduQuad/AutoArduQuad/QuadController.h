@@ -9,7 +9,7 @@ public:
 	QuadController();
 	~QuadController();
 
-	void Update();
+	void Update(unsigned long time);
 	bool Init();
 
 private:
@@ -19,5 +19,6 @@ private:
 	Sensors* _sensors;
 	MotorMgr* _motorMgr;
 	bool _run;
+	bool _systemsCalibrated;
 };
 

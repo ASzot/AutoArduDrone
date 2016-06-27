@@ -4,6 +4,9 @@
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "Wire.h"
 #include "SerialHelper.h"
+#include "Common.h"
+
+#define SAMPLE_TIME 2000
 
 MPU6050 _mpu;
 
@@ -23,6 +26,9 @@ MPU::MPU()
 	YPR = new double[3];
 	for (int i = 0; i < 3; ++i)
 		YPR[i] = 0.0;
+
+	_totalSampleTime = 0;
+	_lastYPR = NULL;
 }
 
 bool MPU::Init()
@@ -69,7 +75,63 @@ bool MPU::Init()
 	return true;
 }
 
-// Get new data
+bool MPU::UpdateCal(unsigned long dTime)
+{
+	Serial.print("Passed Delta :");
+	Serial.println(dTime);
+
+	Update();
+	if (_lastYPR == NULL)
+	{
+		_lastYPR = new double[3];
+		for (int i = 0; i < 3; ++i)
+		{
+			if (YPR[i] < 999 && YPR[i] > -999)
+			{
+				_lastYPR[i] = YPR[i];
+			}
+			else
+			{
+				_lastYPR = NULL;
+				return false;
+			}
+		}
+	}
+
+	Serial.print("Before adding: ");
+	Serial.println(_totalSampleTime);
+	
+	Serial.print("Delta Used :");
+	Serial.println(dTime);
+
+	_totalSampleTime += dTime;
+	SerialHelper::Print("Total sample: ");
+	Serial.println(_totalSampleTime);
+	if (_totalSampleTime > SAMPLE_TIME)
+	{
+		_totalSampleTime = 0.0;
+
+		// Find the magnitude of the change in the YPR.
+		double magSq = 0.0;
+		for (int i = 0; i < 3; ++i)
+		{
+			magSq += (YPR[i] - _lastYPR[i]) * (YPR[i] - _lastYPR[i]);
+			_lastYPR[i] = YPR[i];
+		}
+
+		SerialHelper::Print("Change is ");
+		SerialHelper::Println(magSq);
+
+		if (magSq < 0.03)
+		{
+			Zero();
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void MPU::Update()
 {		
 	double *ypr = CalculateYPR();
