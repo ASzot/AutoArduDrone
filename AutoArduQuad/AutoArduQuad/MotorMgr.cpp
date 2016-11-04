@@ -17,6 +17,8 @@ MotorMgr::MotorMgr(void)
 	_verboseNS = false;
 	_verboseEW = false;
 	_verboseYaw = false;
+	_printNS = false;
+	_printEW = false;
 }
 
 
@@ -35,12 +37,22 @@ MotorMgr::~MotorMgr(void)
 	_motors = 0;
 }
 
-void MotorMgr::SetBaseSpeed(double d)
+void MotorMgr::PrintEW()
+{
+	_printEW = true;
+}
+
+void MotorMgr::PrintNS()
+{
+	_printNS = true;
+}
+
+void MotorMgr::SetBaseSpeed(int d)
 {
 	_baseSpeed = d;
 }
 
-double MotorMgr::GetBaseSpeed()
+int MotorMgr::GetBaseSpeed()
 {
 	return _baseSpeed;
 }
@@ -51,8 +63,8 @@ bool MotorMgr::Init(MPU* mpu)
 	_ypr1 = &mpu->YPR[1];
 	_ypr2 = &mpu->YPR[2];
 
-	_nsController = new PID(&mpu->YPR[2], &_nsOut, &_setNS, 7, 0.0, 1.1, REVERSE);
-	_ewController = new PID(&mpu->YPR[1], &_ewOut, &_setEW, 10.0, 0.0, 1.5, REVERSE);
+	_nsController = new PID(&mpu->YPR[1], &_nsOut, &_setNS, 0.9, 0.15, 0.1, REVERSE);
+	_ewController = new PID(&mpu->YPR[2], &_ewOut, &_setEW, 0.8, 0.6, 0.1, REVERSE);
 	_yawController = new PID(&mpu->YPR[0], &_yawOut, &_setYaw, 2.0, 0.0, 0.0, DIRECT);
 	
 	_ewController->SetMode(AUTOMATIC);
@@ -66,7 +78,7 @@ bool MotorMgr::Init(MPU* mpu)
 	_motors->Init();
 
 	// Set here which controller should be affected by tuning parameters. 
-	_editController = _yawController;
+	_editController = _ewController;
 
 	return true;
 }
@@ -89,20 +101,48 @@ void MotorMgr::Update()
 
 	_nsController->Compute(_verboseNS);
 	_ewController->Compute(_verboseEW);
-	_yawController->Compute(_verboseYaw);
+	//_yawController->Compute(_verboseYaw);
 
-	SerialHelper::Print("Yaw: ");
-	SerialHelper::Println(_yawOut);
-	
-	SerialHelper::Print("EW: ");
-	SerialHelper::Println(_ewOut);
-	
-	SerialHelper::Print("NS: ");
-	SerialHelper::Println(_nsOut);
+	//SerialHelper::Print("Yaw: ");
+	//SerialHelper::Println(_yawOut);
+	//
+	//SerialHelper::Print("EW: ");
+	//SerialHelper::Println(_ewOut);
+	//
+	//SerialHelper::Print("NS: ");
+	//SerialHelper::Println(_nsOut);
 
-	_motors->SetNS(_baseSpeed + _yawOut, _nsOut);
-	_motors->SetEW(_baseSpeed - _yawOut, _ewOut);
+	// Arduino won't allow conversions from double to int?!?
+	// But it will allow double to float to int???
+	// Even though I believe double and float are represented the same on the Uno.
+	int iNsOut = GetNSDiff();
+	int iEwOut = GetEWDiff();
 
+	if (_printNS)
+	{
+		SerialHelper::Println(iNsOut);
+		_printNS = false;
+	}
+	if (_printEW)
+	{
+		SerialHelper::Println(iEwOut);
+		_printEW = false;
+	}
+
+	//_motors->SetNS(_baseSpeed + 0, iNsOut);
+	_motors->SetEW(_baseSpeed - 0, iEwOut);
+}
+
+int MotorMgr::GetNSDiff()
+{
+	double nsOut = _nsOut;
+	return (int)(float)nsOut;
+}
+
+int MotorMgr::GetEWDiff()
+{
+	double ewOut = _ewOut;
+	return (int)(float)ewOut;
 }
 
 bool MotorMgr::GetTestMode()
@@ -118,31 +158,43 @@ void MotorMgr::StopAll()
 void MotorMgr::IncreaseP()
 {
 	_editController->SetTunings(_editController->GetKp() + 0.1, _editController->GetKi(), _editController->GetKd());
+	Serial.print("P: ");
+	Serial.println(_editController->GetKp());
 }
 
 void MotorMgr::DecreaseP()
 {
 	_editController->SetTunings(_editController->GetKp() - 0.1, _editController->GetKi(), _editController->GetKd());
+	Serial.print("P: ");
+	Serial.println(_editController->GetKp());
 }
 
 void MotorMgr::IncreaseI()
 {
 	_editController->SetTunings(_editController->GetKp(), _editController->GetKi() + 0.1, _editController->GetKd());
+	Serial.print("I: ");
+	Serial.println(_editController->GetKi());
 }
 
 void MotorMgr::DecreaseI()
 {
 	_editController->SetTunings(_editController->GetKp(), _editController->GetKi() - 0.1, _editController->GetKd());
+	Serial.print("I: ");
+	Serial.println(_editController->GetKi());
 }
 
 void MotorMgr::IncreaseD()
 {
 	_editController->SetTunings(_editController->GetKp(), _editController->GetKi(), _editController->GetKd() + 0.1);
+	Serial.print("D: ");
+	Serial.println(_editController->GetKd());
 }
 
 void MotorMgr::DecreaseD()
 {
 	_editController->SetTunings(_editController->GetKp(), _editController->GetKi(), _editController->GetKd() - 0.1);
+	Serial.print("D: ");
+	Serial.println(_editController->GetKd());
 }
 
 void MotorMgr::GetP()

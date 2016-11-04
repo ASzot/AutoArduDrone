@@ -6,7 +6,7 @@
 #include "SerialHelper.h"
 #include "Common.h"
 
-#define SAMPLE_TIME 2000
+#define SAMPLE_TIME 3000
 
 MPU6050 _mpu;
 
@@ -42,8 +42,12 @@ bool MPU::Init()
     #endif
 
     _mpu.initialize();
+	SerialHelper::Println("Attempting to initalize mpu");
 	if (!_mpu.testConnection())
+	{
+		SerialHelper::Println("Test connection failed");
 		return false;
+	}
 
 	uint8_t devStatus = _mpu.dmpInitialize();
 
@@ -63,6 +67,7 @@ bool MPU::Init()
 	}
 	else 
 	{
+		SerialHelper::Println("Dev status is invalid");
 		return false;
 	}
 
@@ -77,8 +82,8 @@ bool MPU::Init()
 
 bool MPU::UpdateCal(unsigned long dTime)
 {
-	Serial.print("Passed Delta :");
-	Serial.println(dTime);
+	/*Serial.print("Passed Delta :");
+	Serial.println(dTime);*/
 
 	Update();
 	if (_lastYPR == NULL)
@@ -98,15 +103,15 @@ bool MPU::UpdateCal(unsigned long dTime)
 		}
 	}
 
-	Serial.print("Before adding: ");
-	Serial.println(_totalSampleTime);
-	
-	Serial.print("Delta Used :");
-	Serial.println(dTime);
+	//Serial.print("Before adding: ");
+	//Serial.println(_totalSampleTime);
+	//
+	//Serial.print("Delta Used :");
+	//Serial.println(dTime);
 
 	_totalSampleTime += dTime;
-	SerialHelper::Print("Total sample: ");
-	Serial.println(_totalSampleTime);
+	//SerialHelper::Print("Total sample: ");
+	//Serial.println(_totalSampleTime);
 	if (_totalSampleTime > SAMPLE_TIME)
 	{
 		_totalSampleTime = 0.0;
@@ -191,7 +196,7 @@ double* MPU::CalculateYPR()
 		double* finalYpr = new double[3];
 		finalYpr[0] = (double)ypr[0] * (180.0 / M_PI);
 		finalYpr[1] = (double)ypr[1] * (180.0 / M_PI);
-		finalYpr[2] = (double)ypr[2] * (180.0 / M_PI);
+		finalYpr[2] = (double)ypr[2] * (-180.0 / M_PI);
 
 		return finalYpr;
 	}

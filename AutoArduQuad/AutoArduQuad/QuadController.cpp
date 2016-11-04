@@ -29,19 +29,17 @@ void QuadController::Update(unsigned long time)
 			_systemsCalibrated = true;
 			SerialHelper::Println("Systems Calibrated.");
 		}
-		return;
 	}
 	else
 	{
 		_sensors->Update();
-	}
+		//if (_run)
+		//{
+		//	_motorMgr->Update();
+		//}
 
-	if (_run)
-	{
-		_motorMgr->Update();
+		UpdateInput();
 	}
-
-	UpdateInput();
 }
 
 bool QuadController::Init()
@@ -59,11 +57,11 @@ bool QuadController::Init()
 		return false;
 	}
 
-	if (!_motorMgr->Init(_sensors->GetMPU()))
-	{
-		SerialHelper::Println("Couldn't init motors");
-		return false;
-	}
+	//if (!_motorMgr->Init(_sensors->GetMPU()))
+	//{
+	//	SerialHelper::Println("Couldn't init motors");
+	//	return false;
+	//}
 
 	SerialHelper::Println("Init successful");
 	SerialHelper::Println("Calibrating Systems...");
@@ -84,12 +82,22 @@ void QuadController::UpdateInput()
 	}
 	else if (input == '1')
 	{
-		_motorMgr->SetBaseSpeed(_motorMgr->GetBaseSpeed() + 100.0);
+		_motorMgr->SetBaseSpeed(_motorMgr->GetBaseSpeed() + 100);
 		SerialHelper::Println(_motorMgr->GetBaseSpeed());
 	}
 	else if (input == '2')
 	{
-		_motorMgr->SetBaseSpeed(_motorMgr->GetBaseSpeed() - 100.0);
+		_motorMgr->SetBaseSpeed(_motorMgr->GetBaseSpeed() - 100);
+		SerialHelper::Println(_motorMgr->GetBaseSpeed());
+	}
+	else if (input == 'a')
+	{
+		_motorMgr->SetBaseSpeed(_motorMgr->GetBaseSpeed() + 20);
+		SerialHelper::Println(_motorMgr->GetBaseSpeed());
+	}
+	else if (input == 'b')
+	{
+		_motorMgr->SetBaseSpeed(_motorMgr->GetBaseSpeed() - 20);
 		SerialHelper::Println(_motorMgr->GetBaseSpeed());
 	}
 	else if (input == 'V')
@@ -107,27 +115,27 @@ void QuadController::UpdateInput()
 		if (!_run)
 			_motorMgr->StopAll();
 	}
-	else if (input == '1')
+	else if (input == '3')
 	{
 		_motorMgr->IncreaseP();
 	}
-	else if (input == '2')
+	else if (input == '4')
 	{
 		_motorMgr->DecreaseP();
 	}
-	else if (input == '3')
+	else if (input == '5')
 	{
 		_motorMgr->IncreaseI();
 	}
-	else if (input == '4')
+	else if (input == '6')
 	{
 		_motorMgr->DecreaseI();
 	}
-	else if (input == '5')
+	else if (input == '7')
 	{
 		_motorMgr->IncreaseD();
 	}
-	else if (input == '6')
+	else if (input == '8')
 	{
 		_motorMgr->DecreaseD();
 	}
@@ -145,5 +153,13 @@ void QuadController::UpdateInput()
 	{
 		SerialHelper::Println("Yaw verbose output toggled.");
 		_motorMgr->SetVerboseYaw(!_motorMgr->GetVerboseYaw());
+	}
+	else if (input == 'p')
+	{
+		_motorMgr->PrintNS();
+	}
+	else if (input == 'o')
+	{
+		_motorMgr->PrintEW();
 	}
 }

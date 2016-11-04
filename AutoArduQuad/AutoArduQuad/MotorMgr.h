@@ -13,8 +13,8 @@ public:
 	bool Init(MPU* mpu);
 	void Update();
 
-	void SetBaseSpeed(double baseSpeed);
-	double GetBaseSpeed();
+	void SetBaseSpeed(int baseSpeed);
+	int GetBaseSpeed();
 
 	void StopAll();
 
@@ -40,6 +40,13 @@ public:
 	bool GetVerboseNS();
 	bool GetVerboseYaw();
 
+	void PrintNS();
+	void PrintEW();
+
+private:
+	int GetNSDiff();
+	int GetEWDiff();
+
 private: 
 	PID* _nsController;
 	PID* _ewController;
@@ -52,7 +59,7 @@ private:
 	double _nsOut;
 	double _ewOut;
 	double _yawOut;
-	double _baseSpeed;
+	int _baseSpeed;
 	double _setNS;
 	double _setEW;
 	double _setYaw;
@@ -65,5 +72,8 @@ private:
 	bool _verboseNS;
 	bool _verboseEW;
 	bool _verboseYaw;
+
+	bool _printNS;
+	bool _printEW;
 };
 

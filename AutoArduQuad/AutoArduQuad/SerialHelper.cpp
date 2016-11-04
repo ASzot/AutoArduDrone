@@ -14,6 +14,11 @@ namespace SerialHelper
 		Serial.begin(115200);
 	}
 
+	void Print(int i)
+	{
+		Serial.print(i);
+	}
+
 	void Print(char *str)
 	{
 		Serial.print(str);
@@ -37,6 +42,12 @@ namespace SerialHelper
 	void Print(unsigned long l)
 	{
 		Serial.print(l);
+	}
+
+	void Println(int i)
+	{
+		Print(i);
+		Println();
 	}
 
 	void Println(char *str)
